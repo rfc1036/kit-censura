@@ -1,0 +1,72 @@
+** What is this? **
+
+cen|sù|ra: controllo esercitato da un'autorità civile o religiosa su
+pubblicazioni, spettacoli, mezzi di informazione, per adeguarli ai
+principi della legge, di una religione o di una dottrina morale.
+(Tullio De Mauro, il dizionario della lingua italiana.)
+
+censor [transitive verb]: to suppress or delete as objectionable.
+(Merriam-Webster's Online dictionary.)
+
+Censorship is the removal or withholding of information from the public
+by a controlling group or body. (Wikipedia entry for Censorship.)
+
+This suite of programs implements by-domain and by-IP censorship of the
+Internet. It is designed to be able to accomodate multiple blacklists
+and be easily extensible.
+
+
+** Requirements **
+
+install-routes-linux: iproute
+parse_cncpo: Text::CSV >= 0.32
+update_aams: wget, unrtf, awk
+update_cncpo: wget
+upload-bind-config: rsync (local and remote), BIND (remote)
+upload-unbound-config: rsync (local and remote), Unbound (remote)
+
+** Author **
+
+Copyright 2008-2010 by Seeweb s.r.l.
+Written by Marco d'Itri <md@Linux.IT>.
+
+The author will appreciate receiving success or failure reports about
+the deployment this software.
+
+
+** License **
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+
+** Usage **
+
+Many scripts contain configuration variables. Read and understand each
+one before before running them.
+Start from censorship-get and then censorship-apply.
+
+The install-routes-linux script can be run directly on a border router
+or on a system where a dynamic routing protocol will redistribute the
+static routes it installs.
+
+
+** Name servers configuration **
+
+Something like this should be added to the main configuration file of
+your name server daemon:
+
+# named.conf (BIND)
+include "/etc/bind/censura/named.conf";
+
+# unbound.conf (Unbound)
+include: "/etc/unbound/censura.conf"
+
+and the db.* files need to be copied in the $CONFDIR directory configured
+in the build-bind-config script (default: /etc/bind/censura/).
+
+The list of your name servers must be configured in the upload-bind-config
+script.
+

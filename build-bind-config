@@ -1,0 +1,37 @@
+#!/bin/sh -e
+
+# the directory on the name servers containing the zone files
+CONFDIR='/etc/bind/censura'
+
+if [ -z "$1" ]; then
+  echo "Usage: $0 \"LISTS\"" >&2
+fi
+LISTS="$1"
+
+CONF='lists/named.conf'
+
+##############################################################################
+# Generate a named.conf fragment which creates a dummy zone for each domain
+# in the list.
+list2namedconf() {
+  local list="$1"
+
+  local name
+  for name in $(grep '^[^#]' lists/$list); do
+    echo "zone \"$name\" { type master; file \"$CONFDIR/db.$list\"; };"
+  done
+}
+
+##############################################################################
+# Process each list and create a single named.conf file.
+# The perl code suppresses duplicate names.
+for list in $LISTS; do
+  echo "// domains from the $list list"
+  list2namedconf $list
+done | perl -ne '
+/zone "(\S+)" / or print, next; next if $seen{$1}; $seen{$1} = 1; print
+' > $CONF.new
+
+# I apologize for this perl-shell mix, feel free to contribute a pure perl
+# version of this program.
+

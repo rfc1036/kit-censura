@@ -1,0 +1,14 @@
+; Dummy zone to redirect sites censored by CNCPO to your own web server.
+
+$TTL 5M
+@	IN	SOA	localhost. noc.seeweb.it. (
+				1		; serial number
+				4W		; refresh
+				4W		; retry
+				4W		; expire
+				5M )		; negative caching TTL
+
+		NS	localhost.
+
+*		A	212.25.179.125
+

@@ -1,0 +1,168 @@
+#!/usr/bin/perl -w
+# vim: shiftwidth=4 tabstop=4
+#
+# Copyright 2008 by Seeweb s.r.l.
+# Written by Marco d'Itri <md@Linux.IT>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+
+use warnings;
+use strict;
+
+use Text::CSV 0.32;
+use IO::Handle;
+
+##############################################################################
+my $RE_ipaddr = qr/
+	(?: (?: 25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]? ) \. ){3}
+		(?: 25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]? )
+/x;
+my $RE_domain = qr/[a-z0-9\.-]+\.[a-z]+/;
+
+die "Usage: $0 CSV_INPUT DOMAINS_OUTPUT IPS_OUTPUT\n"
+	if @ARGV != 3;
+
+my $list = parse_csv_file($ARGV[0]);
+#use Data::Dumper; print Data::Dumper->Dumpxs([$list], ['list']);
+
+die "FATAL: lista vuota" if not $list or not @$list;
+
+my ($numero, $timestamp) = @{ shift @$list };
+die "FATAL: numero progressivo mancante" if not $numero;
+die "FATAL: orario mancante" if not $timestamp;
+#print "Lista numero $numero del $timestamp.\n";
+
+my ($domains, $ips) = parse_cncpo_list($list);
+
+dedupe_list($domains);
+dedupe_list($ips);
+
+write_list($ARGV[1], $domains);
+write_list($ARGV[2], $ips);
+
+exit 0;
+
+##############################################################################
+sub parse_cncpo_list {
+	my ($list) = @_;
+	my (@block_domains, @block_ips);
+
+	foreach my $row (@$list) {
+		next if @$row == 1;				# skip empty lines in the CSV
+		my ($url, $domain, $ipurl, $ip) = @$row;
+
+		$url = lc $url;
+		$domain = lc $domain;
+
+		if ($url) {
+			if ($url !~ m#^(?:https?://)?($RE_domain)#o) {
+				warn "WARNING: campo 1 non valido per il record $url";
+				next;
+			}
+			my $xdomain = $1;
+			if (not $domain) {
+				$domain = $xdomain;
+				warn "WARNING: campo 2 mancante per il record $url";
+			} elsif ($domain ne $xdomain) {
+				warn "WARNING: campi 1 e 2 non corrispondenti per il"
+					. " record $url";
+				next;
+			}
+		} elsif ($domain) {
+			warn "WARNING: campo 1 mancante per il record $domain";
+		}
+
+		if ($ipurl) {
+			$RE_ipaddr= qr/[0-9\.]+/;
+			if ($ipurl !~ m#^(?:https?://)?(${RE_ipaddr})#o) {
+			#if ($ipurl !~ m#(${RE_ipaddr})#o) {
+				warn "WARNING: campo 3 non valido per il record $ipurl";
+				next;
+			}
+			$ipurl =~ m#^(?:https?://)?(${RE_ipaddr})(?:/.*)?$#o; #
+			my $embeddedip = $1;
+			if (not $ip) {
+				$ip = $embeddedip;
+				warn "WARNING: campo 3 mancante per il record $ipurl";
+			} elsif ($ip ne $embeddedip) {
+				warn "WARNING: campi 3 e 4 non corrispondenti per il"
+					. " record $ipurl";
+				next;
+			}
+		} elsif ($ip) {
+			warn "WARNING: campo 3 mancante per il record $ip";
+		}
+
+		if ($domain) {
+			if ($domain !~ /^$RE_domain$/o) {
+				warn "WARNING: dominio non valido per il record $domain";
+				next;
+			}
+			push(@block_domains, $domain);
+		} elsif ($ip) {
+			if ($ip !~ /^$RE_ipaddr$/o) {
+				warn "WARNING: IP non valido per il record $ip";
+				next;
+			}
+			push(@block_ips, $ip);
+		} else {
+			warn "WARNING: record vuoto";
+		}
+
+	} # foreach
+
+	return (\@block_domains, \@block_ips);
+}
+
+##############################################################################
+sub parse_csv_file {
+	my ($file) = @_;
+
+	open(my $fh, $file) or die "open($file): $!";
+	my $result = parse_csv($fh);
+	close $fh;
+
+	return $result;
+}
+
+sub parse_csv {
+	my ($fh) = @_;
+
+	my $csv = Text::CSV->new({
+		binary		=> 1,
+		sep_char	=> ';',
+	});
+
+	my @list;
+	while (my $row = $csv->getline($fh)) {
+		foreach (@$row) {				# sanitize each field
+			s/[\r\n\t]//g;
+			s/\s+$//;
+		}
+		push(@list, $row);
+	}
+
+	die $csv->error_diag if not $csv->eof;
+
+	return \@list;
+}
+
+##############################################################################
+sub dedupe_list {
+	my ($list) = (@_);
+
+	my %hash = map { $_ => undef } @$list;
+	@$list = keys %hash;
+}
+
+sub write_list {
+	my ($file, $list) = @_;
+
+	open(my $fh, ">$file") or die "open($file): $!";
+	print $fh join("\n", @$list) . "\n";
+	close $fh or die "close($file): $!";
+}
+

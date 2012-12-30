@@ -1,0 +1,27 @@
+#!/bin/sh -e
+
+URL_cncpo='https://195.120.182.203/'
+FILE_cncpo='tmp/blacklist.csv'
+
+CERTS_cncpo='--certificate=cncpo.pem --private-key=cncpo.key --ca-certificate=cncpo-ca.pem'
+
+WGET_OPTS_cncpo="$CERTS_cncpo"
+
+##############################################################################
+# be verbose when stdout is a tty
+if [ ! -t 0 ]; then
+  WGET_OPTS_cncpo="$WGET_OPTS_cncpo -q"
+fi
+
+# on this server, bind to a specific IP address
+if [ "$(hostname --fqdn)" = "anubi.seeweb.it" ]; then
+  WGET_OPTS_cncpo="$WGET_OPTS_cncpo --bind-address=212.25.179.125"
+fi
+
+## downloading ###############################################################
+wget $WGET_OPTS_cncpo $URL_cncpo -O $FILE_cncpo.tmp
+mv $FILE_cncpo.tmp $FILE_cncpo
+
+## parsing ###################################################################
+./parse_cncpo $FILE_cncpo lists/cncpo.new lists/cncpo-ip.new
+

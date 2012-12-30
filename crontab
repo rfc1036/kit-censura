@@ -1,0 +1,17 @@
+# This crontab fragment contains the commands which must be run every day.
+#
+# Please change the time of the second event to avoid slashdotting their
+# poor IIS server.
+
+MAILTO=noc@example.net
+
+# optionally archive the old lists
+22 10		* * *		savelog -c 90 -l -q -r ../archive/ $HOME/censura/tmp/blacklist.csv
+
+# download and parse the lists
+# ... and warn if the list of banned addresses has changed
+26 10		* * *		cd $HOME/censura/ && ./censorship-get && DRY_RUN=1 ./install-routes-linux
+
+# apply the changes, if any
+17 15		* * *		cd $HOME/censura/ && ./censorship-apply
+

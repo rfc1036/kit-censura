@@ -1,0 +1,59 @@
+#!/bin/sh -e
+# This script assumes a Linux system and something (like quagga) which will
+# propagate as null routes the local static routes having a specific nexthop.
+# It will sync these static routes with the ones in the list(s) by adding and
+# removing local routes as needed.
+# Set $DRY_RUN to only get a summary of the changes which would be applied.
+
+LISTS='cncpo'
+BLACKHOLE_NEXTHOP='10.10.0.1'
+
+##############################################################################
+if [ -t 0 ]; then VERBOSE=1; fi
+if [ "$DRY_RUN" ]; then VERBOSE=1; fi
+
+dprintf() {
+  [ "$VERBOSE" ] || return 0
+  printf "$*"
+}
+
+##############################################################################
+list_routes() {
+  local ip="$1"
+  ip -o route list | awk "/ via $ip / {print \$1}"
+}
+
+##############################################################################
+list_routes $BLACKHOLE_NEXTHOP | sort > tmp/routes.installed
+
+for list in $LISTS; do
+  grep '^[^#]' lists/${list}-ip
+done | sort | uniq > tmp/routes.new
+
+comm -13 tmp/routes.installed tmp/routes.new > tmp/routes.added
+comm -23 tmp/routes.installed tmp/routes.new > tmp/routes.removed
+
+if [ -s tmp/routes.added ]; then
+  dprintf "Routes to add:\n"
+  while read ip; do
+    dprintf "$ip\n"
+    [ "$DRY_RUN" ] && continue
+    ip route add "$ip" via $BLACKHOLE_NEXTHOP || \
+      echo "Cannot add a route for $ip!" >&2
+  done < tmp/routes.added
+fi
+
+if [ -s tmp/routes.removed ]; then
+  dprintf "Routes to remove:\n"
+  while read ip; do
+    dprintf "$ip\n"
+    [ "$DRY_RUN" ] && continue
+    ip route del "$ip" via $BLACKHOLE_NEXTHOP || \
+      echo "Cannot remote the route for $ip!" >&2
+  done < tmp/routes.removed
+fi
+
+rm -f tmp/routes.*
+
+exit 0
+

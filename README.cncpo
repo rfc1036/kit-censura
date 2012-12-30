@@ -1,0 +1,50 @@
+This is the procedure to obtain a copy of the SSL certificate needed to
+download the blacklist from the CNCPO web site.
+It keeps the need for access to a Windows system at the absolute minimum
+required and then only for steps which are not security sensitive.
+
+
+Generate a CSR using:
+
+openssl req -nodes -newkey rsa:1024 -keyout newmyprivate.key -out newclient.csr
+
+Some X.500 fields have been overloaded to contain unrelated information,
+so it is mandatory to answer this way the "standard" openssl questions:
+
+Country Name (2 letter code) [AU]:IT
+State or Province Name (full name) [Some-State]:10.0.0.1 10.0.0.2
+Locality Name (eg, city) []:Via Caldera 21, Milano
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:Seeweb s.r.l.
+Organizational Unit Name (eg, section) []:+39-0775-880041 +39-0775-830054
+Common Name (eg, YOUR name) []:Marco d'Itri
+Email Address []:md@seeweb.it
+
+
+Then you can visit https://195.120.182.202:8092/certsrv/certrqxt.asp to
+submit the CSR.
+You must login with the credentials documented in the
+Certificazione\ Client\ SSL\ v.2.0.pdf file which has been distributed by
+the CNCPO.
+It used to be mandatory to use a recent enough version of MSIE running on
+the right version of Windows, but as of 2010-03-15 Firefox on Linux works
+too.
+After the CSR will have been approved you can connect to
+https://195.120.182.202:8092/certsrv/certckpn.asp to download it and
+then convert it to PEM format:
+
+openssl x509 -in /tmp/certnew.cer -inform DER -out cncpo.pem -outform PEM
+
+
+After downloading the root certificate from the main page of the web
+site you will need to convert it to PEM format:
+
+unzip CertificatoCA.zip
+openssl x509 -in CertificatoCA.cer -inform DER -out cncpo-ca.pem -outform PEM
+
+
+
+If you already have a certificate in PFX format instead, you can convert
+it to PEM using this command and then separate the public and private keys:
+
+openssl pkcs12 -nodes -in cncpo.pfx -out cncpo-full.pem
+

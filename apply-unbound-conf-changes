@@ -1,0 +1,200 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+use autodie;
+use feature qw(switch);
+
+use Getopt::Long;
+use Pod::Usage;
+use List::Compare; # liblist-compare-perl
+
+my ($old_file, $new_file, $verbose, $dry_run, $help, $man);
+
+my $result = GetOptions(
+	'old-file=s'		=> \$old_file,
+	'new-file=s'		=> \$new_file,
+	'verbose'			=> \$verbose,
+	'dry-run'			=> \$dry_run,
+	'help'				=> \$help,
+	'man'				=> \$man,
+) or exit 255;
+
+pod2usage(-verbose => 1, -exitstatus => 0) if $help;
+pod2usage(-verbose => 2, -exitstatus => 0) if $man;
+
+die "Missing parameters.\n" if not ($old_file and $new_file);
+
+##############################################################################
+my $configured_zones = parse_unbound_conf($old_file);
+my $new_zones = parse_unbound_conf($new_file);
+
+my $lc_types = List::Compare->new(
+	[ keys %{$configured_zones} ], [ keys %{$new_zones} ]
+);
+my @target_types = $lc_types->get_union;
+print "# Targets: @target_types\n" if $verbose;
+
+foreach my $ip (@target_types) {
+	# one of the lists may not exist
+	$configured_zones->{$ip} //= [ ];
+	$new_zones->{$ip} //= [ ];
+
+	# compute the differences between the two sets of zones
+	my $lc = List::Compare->new({
+		lists => [ $configured_zones->{$ip}, $new_zones->{$ip} ],
+		unsorted => 1,
+	});
+
+	my @added   = $lc->get_Ronly;
+	my @removed = $lc->get_Lonly;
+	print "\n* now processing the entries with target '$ip':\n"
+		if $verbose and (@added or @removed);
+	add_zone(   $ip, $_) foreach @added;
+	remove_zone($ip, $_) foreach @removed;
+}
+
+rename($new_file, $old_file) if not $dry_run;
+
+exit 0;
+
+##############################################################################
+sub add_zone {
+	my ($ip, $zone) = @_;
+
+	print "+ ADDED:   $zone\n" if $verbose;
+	if ($ip eq 'static') {
+		unbound_control('local_zone', $zone, $ip);
+	} elsif ($ip =~ /:/) {
+		unbound_control('local_data', $zone, "AAAA $ip");
+	} else {
+		unbound_control('local_data', $zone, "A $ip");
+	}
+}
+
+sub remove_zone {
+	my ($ip, $zone) = @_;
+
+	print "- REMOVED: $zone\n" if $verbose;
+	if ($ip eq 'static') {
+		unbound_control('local_zone_remove', $zone);
+	} else {
+		unbound_control('local_data_remove', $zone);
+	}
+}
+
+##############################################################################
+sub unbound_control {
+	my (@args) = @_;
+
+	my $command = join(' ', 'unbound-control', @args);
+	if ($dry_run) {
+		print "  RUN: $command\n";
+		return;
+	}
+
+	system($command);
+	if ($? == -1) {
+		warn "Command failed to execute: $!\n$command\n\n";
+	} elsif ($? & 127) {
+		warn 'Command died with signal ' . ($? & 127) . ":\n$command\n\n";
+	} elsif ($? > 0) {
+		warn 'Child exited with value ' . ($? >> 8) . ":\n$command\n\n";
+	}
+}
+
+##############################################################################
+sub parse_unbound_conf {
+	my ($file) = @_;
+	my $in_server_section = 1; # XXX
+	my $zones = { };
+
+	open(my $fh, '<', $file);
+	while (<$fh>) {
+		chomp;
+		s/#.*$//; s/^\s+//; s/\s+$//;
+		next if /^$/;
+
+		my ($directive, $argument) = /^(\S+):(?:\s*(.+))?$/;
+		next unless $directive;
+
+		if ($directive eq 'local-data') {
+			next unless $in_server_section;
+			next unless $argument;
+			my ($zone, $ip)
+				= $argument =~ /^"\s*(\S+)\s+(?:A|AAAA)\s+([0-9\.]+)\s*"$/;
+			next unless $zone and $ip;
+			push(@{ $zones->{$ip} }, $zone);
+		} elsif ($directive eq 'local-zone') {
+			next unless $in_server_section;
+			next unless $argument;
+			my ($zone) = $argument =~ /^"\s*(\S+)\s*"\s+static$/;
+			next unless $zone;
+			push(@{ $zones->{static} }, $zone);
+		} else {
+		   	next;
+		}
+	}
+	close $fh;
+
+	return $zones;
+}
+
+##############################################################################
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+apply-unbound-conf-changes - update Upstart local zones without restarting it
+
+=head1 SYNOPSIS
+
+apply-unbound-conf-changes [--verbose] [--dry-run] \
+  --old-file=NAME --new-file=NAME
+
+=head1 DESCRIPTION
+
+This program dynamically applies to a running I<Unbound> instance,
+using the I<unbound-control> command, the changes in the I<local-data>
+and I<local-zone> directives in a pair of "current" and "new"
+configuration files.
+
+Unless the B<--dry-run> option is used, it will rename I<new-file>
+over I<old-file> when it completes successfully.
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--new-file>
+
+The file containing the new configuration.
+
+=item B<--old-file>
+
+The file containing the current configuration.
+
+=item B<--dry-run>
+
+Print the commands instead of actually running them.
+
+=item B<--verbose>
+
+Show the differences between the two files.
+
+=item B<--help>
+
+Display a short help message.
+
+=item B<--man>
+
+Display the manual.
+
+=back
+
+=head1 BUGS
+
+The configuration file parser is very simple-minded.
+

@@ -1,0 +1,41 @@
+#!/bin/sh -e
+
+if [ -z "$1" ]; then
+  echo "Usage: $0 \"LISTS\"" >&2
+fi
+LISTS="$1"
+
+CONF='lists/unbound.conf'
+
+##############################################################################
+list2unboundconf() {
+  local list="$1"
+  local ipredir="$2"
+
+  local name
+  if [ "$ipredir" ]; then
+    for name in $(grep '^[^#]' lists/$list); do
+      printf "\tlocal-data: \"$name A $ipredir\"\n"
+    done
+  else
+    for name in $(grep '^[^#]' lists/$list); do
+      printf "\tlocal-zone: \"$name\" static\n"
+    done
+  fi
+}
+
+##############################################################################
+# process the lists and build the final unbound.conf file
+echo "server:" > $CONF.new
+for list in $LISTS; do
+  case "$list" in
+  cncpo) ipredir='212.25.179.125' ;;
+  aams)  ipredir='217.175.53.72' ;;
+  #*)     ipredir='127.0.0.1' ;;
+  *)     ipredir='' ;;
+  esac
+
+  printf "\t# domains from the $list list\n"
+  list2unboundconf $list $ipredir
+done >> $CONF.new
+

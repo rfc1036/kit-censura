@@ -1,0 +1,9 @@
+#!/bin/sh -e
+# This master script runs the scripts which implement by-name and by-IP
+# censorship.
+# It must not fail even if one of the steps fail.
+
+./upload-bind-config || true
+#./upload-unbound-config || true
+./install-routes-linux || true
+
