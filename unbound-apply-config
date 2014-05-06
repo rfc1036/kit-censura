@@ -1,4 +1,13 @@
 #!/usr/bin/perl
+# vim: shiftwidth=4 tabstop=4
+#
+# Copyright 2010-2014 by Seeweb s.r.l.
+# Written by Marco d'Itri <md@Linux.IT>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
 
 use warnings;
 use strict;
@@ -132,7 +141,7 @@ sub parse_unbound_conf {
 			next unless $zone;
 			push(@{ $zones->{static} }, $zone);
 		} else {
-		   	next;
+			next;
 		}
 	}
 	close $fh;
@@ -147,11 +156,11 @@ __END__
 
 =head1 NAME
 
-apply-unbound-conf-changes - update Upstart local zones without restarting it
+unbound-apply-config - update Upstart local zones without restarting it
 
 =head1 SYNOPSIS
 
-apply-unbound-conf-changes [--verbose] [--dry-run] \
+unbound-apply-config [--verbose] [--dry-run] \
   --old-file=NAME --new-file=NAME
 
 =head1 DESCRIPTION
@@ -197,4 +206,17 @@ Display the manual.
 =head1 BUGS
 
 The configuration file parser is very simple-minded.
+
+=head1 AUTHOR
+
+This program was written by Marco d'Itri <md@linux.it>
+
+=head1 COPYRIGHT
+
+Copyright 2010-2014 by Seeweb s.r.l.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
 
