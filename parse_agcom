@@ -1,0 +1,102 @@
+#!/usr/bin/perl
+# vim: shiftwidth=4 tabstop=4
+#
+# Copyright 2014 by Seeweb s.r.l.
+# Written by Marco d'Itri <md@Linux.IT>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+
+use warnings;
+use strict;
+use autodie;
+
+use Regexp::Common qw(net URI);
+use List::MoreUtils qw(uniq);
+use File::Slurp;
+
+##############################################################################
+die "Usage: $0 TXT_INPUT DOMAINS_OUTPUT IPS_OUTPUT\n"
+	if @ARGV != 3;
+
+my $lists = parse_agcom_file($ARGV[0]);
+
+die "Censoring URLs is not supported!\n"
+	if $lists->{urls} and @{ $lists->{urls} };
+
+die "No domains found!\n"
+	if not $lists->{domains} or not @{ $lists->{domains} };
+
+write_file($ARGV[1], { atomic => 1 },
+	map { "$_\n" } sort @{ $lists->{domains} });
+write_file($ARGV[2], { atomic => 1 },
+	map { "$_\n" } sort @{ $lists->{ips} });
+
+exit 0;
+
+##############################################################################
+sub parse_agcom_file {
+	my ($file) = @_;
+
+	open(my $fh, '<:encoding(UTF-16)', $file);
+
+	my $first_line = <$fh>;
+	die "$file is empty!\n" if not $first_line;
+
+	# the first line of the file contains an incremental number and a date
+	my ($number, $date_y, $date_m, $date_d) = $first_line =~ /^
+		\s*
+		(\d+)			# incremental number
+		[\s_]+
+		(\d{4}) [\.:-]+	# year
+		(\d{2}) [\.:-]+	# month
+		(\d{2}) 		# day
+		\s*$
+	/x;
+	die "$file has an invalid header!\n"
+		if not ($number and $date_y and $date_m and $date_d);
+
+	my (@ips, @domains, @urls);
+	while (<$fh>) {
+		s/^\s+//;
+		# these two regexps cannot be joined because the last line may lack
+		# the end of line character(s)
+		s/[\r\n]+$//;
+		s/\s*$//;
+
+		# normalize some domains which are written as URLs
+		s#^http://($RE{net}{IPv4}|$RE{net}{domain}{-nospace}{-rfc1101})/?$#$1#;
+
+		if (/^$RE{net}{IPv4}$/) {
+			push(@ips, $_);
+			next;
+		}
+
+		if (/^$RE{net}{domain}{-nospace}{-rfc1101}$/) {
+			push(@domains, lc $_);
+			next;
+		}
+
+		if (/^$RE{URI}{HTTP}{-scheme => 'https?'}$/) {
+			push(@urls, $_);
+			next;
+		}
+
+		warn "Invalid entry in $file: '$_'\n";
+	}
+
+	close $fh;
+
+	die "$file contains no data!\n" if not (@domains or @ips or @urls);
+
+	return {
+		number	=> $number + 0,
+		date	=> "$date_y-$date_m-$date_d",
+		ips		=> [ uniq @ips ],
+		domains	=> [ uniq @domains ],
+		urls	=> [ uniq @urls ],
+	};
+}
+
