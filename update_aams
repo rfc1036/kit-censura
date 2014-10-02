@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-URL_aams='http://www.aams.gov.it/sites/aams2008/files/documenti_old/private/downloads/documentazione/scommesse/Elenco_siti_inibiti/elenco_siti_inibiti.rtf'
+URL_aams='ftp://ftp.finanze.it/pub/monopoli/elenco_siti_inibiti.rtf'
 FILE_aams='tmp/elenco_siti_inibiti.rtf'
 
 WGET_OPTS_aams=''
