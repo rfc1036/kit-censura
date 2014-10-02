@@ -145,7 +145,10 @@ sub parse_csv {
 		push(@list, $row);
 	}
 
-	die $csv->error_diag if not $csv->eof;
+	if (not $csv->eof) {
+		my ($code, $str, $pos) = $csv->error_diag;
+		die "CSV ERROR: $code - $str at line $pos!\n"
+	}
 
 	return \@list;
 }
