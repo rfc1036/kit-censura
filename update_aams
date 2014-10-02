@@ -6,17 +6,6 @@ FILE_aams='tmp/elenco_siti_inibiti.rtf'
 WGET_OPTS_aams=''
 
 ##############################################################################
-rtf2list() {
-  unrtf --nopict --text "$1" 2> /dev/null | \
-    awk '/^[\t ]+[0-9]+[\t ]+[a-zA-Z0-9\.-]+[\t ]*$/ {print $2}' | \
-    grep -v -E '\.[0-9]+$' | \
-    sort | \
-    uniq | \
-    tr A-Z a-z
-  rm -f pict*.wmf # XXX work around a unrtf bug!
-}
-
-##############################################################################
 # be verbose when stdout is a tty
 if [ ! -t 0 ]; then
   WGET_OPTS_aams="$WGET_OPTS_aams -q"
@@ -27,12 +16,5 @@ wget $WGET_OPTS_aams $URL_aams -O $FILE_aams.tmp
 mv $FILE_aams.tmp $FILE_aams
 
 ## parsing ###################################################################
-rtf2list $FILE_aams > lists/aams.new.tmp
-
-if [ ! -s lists/aams.new.tmp ]; then
-  echo "lists/aams.new.tmp is empty!"
-  exit 1
-fi
-
-mv lists/aams.new.tmp lists/aams.new
+./parse_aams $FILE_aams lists/aams.new
 

@@ -1,0 +1,112 @@
+#!/usr/bin/perl
+# vim: shiftwidth=4 tabstop=4
+#
+# Copyright 2014 by Seeweb s.r.l.
+# Written by Marco d'Itri <md@Linux.IT>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+
+use warnings;
+use strict;
+use autodie;
+
+use Regexp::Common qw(net URI);
+use List::MoreUtils qw(uniq);
+use File::Slurp;
+
+# Set this to true if your domain censorship method automatically censors
+# all the subdomains of a censored domain.
+my $Remove_Subdomains = 1;
+
+##############################################################################
+die "Usage: $0 RTF_INPUT DOMAINS_OUTPUT\n"
+	if @ARGV != 2;
+
+my $lists = parse_aams_file($ARGV[0]);
+
+die "Censoring URLs is not supported!\n"
+	if $lists->{urls} and @{ $lists->{urls} };
+
+die "Censoring IPs is not supported!\n"
+	if $lists->{ips} and @{ $lists->{ips} };
+
+die "No domains found!\n"
+	if not $lists->{domains} or not @{ $lists->{domains} };
+
+remove_subdomains($lists) if $Remove_Subdomains;
+
+write_file($ARGV[1], { atomic => 1 },
+	map { "$_\n" } sort @{ $lists->{domains} });
+
+exit 0;
+
+##############################################################################
+sub parse_aams_file {
+	my ($file) = @_;
+
+	open(my $fh, '-| :encoding(iso-8859-1)', "unrtf --nopict --text $file");
+
+	my $first_line = <$fh>;
+	die "$file is empty!\n" if not $first_line or not $first_line =~ /UnRTF/;
+
+	my (@ips, @domains, @urls);
+	while (<$fh>) {
+		next if not s/^\s* \d+ \s+ (.+?) \s*$/$1/x;
+
+		# normalize some domains which are written as URLs
+		s#^http://($RE{net}{IPv4}|$RE{net}{domain}{-nospace}{-rfc1101})/?$#$1#;
+
+		if (/^$RE{net}{IPv4}$/) {
+			push(@ips, $_);
+			next;
+		}
+
+		if (/^$RE{net}{domain}{-nospace}{-rfc1101}$/) {
+			push(@domains, lc $_);
+			next;
+		}
+
+		if (/^$RE{URI}{HTTP}{-scheme => 'https?'}$/) {
+			push(@urls, $_);
+			next;
+		}
+
+		warn "Invalid entry in $file: '$_'\n";
+	}
+
+	close $fh;
+
+	die "$file contains no data!\n" if not (@domains or @ips or @urls);
+
+	return {
+		ips		=> [ uniq @ips ],
+		domains	=> [ uniq @domains ],
+		urls	=> [ uniq @urls ],
+	};
+}
+
+##############################################################################
+sub remove_subdomains {
+	my ($l) = @_;
+	return if not $l or not $l->{domains};
+
+	my $list = $l->{domains};
+
+	my %domains = map { $_ => undef } @$list;
+
+	for (my $i = 0; $i < @$list; $i++) {
+		my $domain = $list->[$i];
+		# remove each leading component of the domain and check if the new
+		# resulting domain is in our list
+		while ($domain =~ s/^.+?\.(.+\..+)$/$1/) {
+			delete $list->[$i] if exists $domains{$domain};
+		}
+	}
+
+	# remove the deleted domains from the list
+	$l->{domains} = [ grep { defined $_ } @{ $l->{domains} } ];
+}
+
