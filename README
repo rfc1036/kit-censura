@@ -27,6 +27,8 @@ update_*: wget
 upload-bind-config: rsync (local and remote), BIND (remote)
 upload-unbound-config: rsync (local and remote), Unbound (remote)
 
+IDN support requires unrtf >= 0.21.
+
 ** Author **
 
 Copyright 2008-2014 by Seeweb s.r.l.
