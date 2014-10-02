@@ -19,8 +19,9 @@ and be easily extensible.
 ** Requirements **
 
 install-routes-linux: iproute
-parse_aams: Regexp::Common, List::MoreUtils, File::Slurp, Net::IDN, unrtf
-parse_agcom: Regexp::Common, List::MoreUtils, File::Slurp
+parse_aams:  Regexp::Common >= 2013031201, List::MoreUtils, File::Slurp,
+             Net::IDN, unrtf
+parse_agcom: Regexp::Common >= 2013031201, List::MoreUtils, File::Slurp
 parse_cncpo: Text::CSV >= 0.32
 update_*: wget
 upload-bind-config: rsync (local and remote), BIND (remote)

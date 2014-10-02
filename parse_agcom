@@ -13,7 +13,7 @@ use warnings;
 use strict;
 use autodie;
 
-use Regexp::Common qw(net URI);
+use Regexp::Common 2013031201 qw(net URI);
 use List::MoreUtils qw(uniq);
 use File::Slurp;
 

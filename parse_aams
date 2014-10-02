@@ -14,7 +14,7 @@ use strict;
 use autodie;
 
 use Net::IDN::Encode qw(domain_to_ascii);
-use Regexp::Common qw(net URI);
+use Regexp::Common 2013031201 qw(net URI);
 use List::MoreUtils qw(uniq);
 use File::Slurp;
 
