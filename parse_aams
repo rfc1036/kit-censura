@@ -13,6 +13,7 @@ use warnings;
 use strict;
 use autodie;
 
+use Net::IDN::Encode qw(domain_to_ascii);
 use Regexp::Common qw(net URI);
 use List::MoreUtils qw(uniq);
 use File::Slurp;
@@ -55,6 +56,15 @@ sub parse_aams_file {
 	my (@ips, @domains, @urls);
 	while (<$fh>) {
 		next if not s/^\s* \d+ \s+ (.+?) \s*$/$1/x;
+
+		# invoke Net::IDN only for non-ASCII data
+		if (/[\x80-\xff]/) {
+			# convert the IDN to ASCII
+			if (s#(https?://)([^/]+)/# $1 . domain_to_ascii($2) #e) {
+			} else {
+				$_ = domain_to_ascii($_);
+			}
+		}
 
 		# normalize some domains which are written as URLs
 		s#^http://($RE{net}{IPv4}|$RE{net}{domain}{-nospace}{-rfc1101})/?$#$1#;
