@@ -19,15 +19,16 @@ and be easily extensible.
 ** Requirements **
 
 install-routes-linux: iproute
+parse_aams: Regexp::Common, List::MoreUtils, File::Slurp, Net::IDN, unrtf
+parse_agcom: Regexp::Common, List::MoreUtils, File::Slurp
 parse_cncpo: Text::CSV >= 0.32
-update_aams: wget, unrtf, awk
-update_cncpo: wget
+update_*: wget
 upload-bind-config: rsync (local and remote), BIND (remote)
 upload-unbound-config: rsync (local and remote), Unbound (remote)
 
 ** Author **
 
-Copyright 2008-2010 by Seeweb s.r.l.
+Copyright 2008-2014 by Seeweb s.r.l.
 Written by Marco d'Itri <md@Linux.IT>.
 
 The author will appreciate receiving success or failure reports about
