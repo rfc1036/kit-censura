@@ -3,7 +3,11 @@
 # blacklist.
 # It must not fail even if one of the steps fail.
 
-LISTS="aams cncpo manuale"
+if [ "$1" ]; then
+  LISTS="$1"
+else
+  LISTS="aams cncpo manuale"
+fi
 
 # update each list
 for list in $LISTS; do
