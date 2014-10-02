@@ -6,7 +6,7 @@
 if [ "$1" ]; then
   LISTS="$1"
 else
-  LISTS="aams cncpo manuale"
+  LISTS="aams agcom cncpo manuale"
 fi
 
 # update each list
