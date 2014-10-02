@@ -20,7 +20,7 @@ and be easily extensible.
 
 install-routes-linux: iproute
 parse_aams:  Regexp::Common >= 2013031201, List::MoreUtils, File::Slurp,
-             Net::IDN, unrtf
+             Net::LibIDN, unrtf
 parse_agcom: Regexp::Common >= 2013031201, List::MoreUtils, File::Slurp
 parse_cncpo: Text::CSV >= 0.32
 update_*: wget

@@ -13,7 +13,7 @@ use warnings;
 use strict;
 use autodie;
 
-use Net::IDN::Encode qw(domain_to_ascii);
+use Net::LibIDN qw(idn_to_ascii);
 use Regexp::Common 2013031201 qw(net URI);
 use List::MoreUtils qw(uniq);
 use File::Slurp;
@@ -57,12 +57,23 @@ sub parse_aams_file {
 	while (<$fh>) {
 		next if not s/^\s* \d+ \s+ (.+?) \s*$/$1/x;
 
-		# invoke Net::IDN only for non-ASCII data
+		# invoke Net::LibIDN only for non-ASCII data
 		if (/[\x80-\xff]/) {
 			# convert the IDN to ASCII
-			if (s#(https?://)([^/]+)/# $1 . domain_to_ascii($2) #e) {
+			if (m#^(https?://)([^/]+)/#) {
+				my ($proto, $domain) = ($1, $2);
+				my $ascii_domain = idn_to_ascii($domain, 'utf-8');
+				if (not $ascii_domain) {
+					warn "idn_to_ascii($domain) failed";
+					next;
+				}
+				s#^(https?://)([^/]+)/#$proto$ascii_domain/#;
 			} else {
-				$_ = domain_to_ascii($_);
+				$_ = idn_to_ascii($_, 'utf-8');
+				if (not $_) {
+					warn "idn_to_ascii($_) failed";
+					next;
+				}
 			}
 		}
 
