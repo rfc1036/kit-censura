@@ -17,6 +17,10 @@ use Regexp::Common qw(net URI);
 use List::MoreUtils qw(uniq);
 use File::Slurp;
 
+# Set this to true if your domain censorship method automatically censors
+# all the subdomains of a censored domain.
+my $Remove_Subdomains = 1;
+
 ##############################################################################
 die "Usage: $0 TXT_INPUT DOMAINS_OUTPUT IPS_OUTPUT\n"
 	if @ARGV != 3;
@@ -28,6 +32,8 @@ die "Censoring URLs is not supported!\n"
 
 die "No domains found!\n"
 	if not $lists->{domains} or not @{ $lists->{domains} };
+
+remove_subdomains($lists) if $Remove_Subdomains;
 
 write_file($ARGV[1], { atomic => 1 },
 	map { "$_\n" } sort @{ $lists->{domains} });
@@ -98,5 +104,27 @@ sub parse_agcom_file {
 		domains	=> [ uniq @domains ],
 		urls	=> [ uniq @urls ],
 	};
+}
+
+##############################################################################
+sub remove_subdomains {
+	my ($l) = @_;
+	return if not $l or not $l->{domains};
+
+	my $list = $l->{domains};
+
+	my %domains = map { $_ => undef } @$list;
+
+	for (my $i = 0; $i < @$list; $i++) {
+		my $domain = $list->[$i];
+		# remove each leading component of the domain and check if the new
+		# resulting domain is in our list
+		while ($domain =~ s/^.+?\.(.+\..+)$/$1/) {
+			delete $list->[$i] if exists $domains{$domain};
+		}
+	}
+
+	# remove the deleted domains from the list
+	$l->{domains} = [ grep { defined $_ } @{ $l->{domains} } ];
 }
 
