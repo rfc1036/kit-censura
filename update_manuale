@@ -1,5 +1,9 @@
 #!/bin/sh -e
 
-egrep '^[^#]' lista.manuale > lists/manuale.new.tmp
-mv lists/manuale.new.tmp lists/manuale.new
+if [ -e lista.manuale ]; then
+  egrep '^[^#]' lista.manuale > lists/manuale.new.tmp
+  mv lists/manuale.new.tmp lists/manuale.new
+elif [ ! -e lists/manuale.new ]; then
+  : > lists/manuale.new
+fi
 
