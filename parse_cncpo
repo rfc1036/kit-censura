@@ -1,7 +1,7 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 # vim: shiftwidth=4 tabstop=4
 #
-# Copyright 2008 by Seeweb s.r.l.
+# Copyright 2014 by Seeweb s.r.l.
 # Written by Marco d'Itri <md@Linux.IT>
 #
 # This program is free software; you can redistribute it and/or modify
@@ -11,9 +11,15 @@
 
 use warnings;
 use strict;
+use autodie;
 
+use List::MoreUtils qw(uniq);
+use File::Slurp;
 use Text::CSV 0.32;
-use IO::Handle;
+
+# Set this to true if your domain censorship method automatically censors
+# all the subdomains of a censored domain.
+my $Remove_Subdomains = 1;
 
 ##############################################################################
 my $RE_ipaddr = qr/
@@ -30,25 +36,34 @@ my $list = parse_csv_file($ARGV[0]);
 
 die "FATAL: lista vuota" if not $list or not @$list;
 
-my ($numero, $timestamp) = @{ shift @$list };
-die "FATAL: numero progressivo mancante" if not $numero;
-die "FATAL: orario mancante" if not $timestamp;
-#print "Lista numero $numero del $timestamp.\n";
+my $lists = parse_cncpo_list($list);
 
-my ($domains, $ips) = parse_cncpo_list($list);
+die "Censoring URLs is not supported!\n"
+	if $lists->{urls} and @{ $lists->{urls} };
 
-dedupe_list($domains);
-dedupe_list($ips);
+die "No domains found!\n"
+	if not $lists->{domains} or not @{ $lists->{domains} };
 
-write_list($ARGV[1], $domains);
-write_list($ARGV[2], $ips);
+remove_subdomains($lists) if $Remove_Subdomains;
+
+write_file($ARGV[1], { atomic => 1 },
+	map { "$_\n" } sort @{ $lists->{domains} });
+write_file($ARGV[2], { atomic => 1 },
+	map { "$_\n" } sort @{ $lists->{ips} });
 
 exit 0;
 
 ##############################################################################
 sub parse_cncpo_list {
 	my ($list) = @_;
-	my (@block_domains, @block_ips);
+	my (@domains, @ips, @urls);
+
+	my ($number, $timestamp, $rest) = @{ shift @$list };
+	die "Invalid blacklist header!\n" if $rest;
+	die "Missing blacklist serial number!\n"
+		if not $number or $number !~ /^\d+$/;
+	die "Missing timestamp!\n"
+		if not $timestamp or $timestamp !~ /^\d+$/;
 
 	foreach my $row (@$list) {
 		next if @$row == 1;				# skip empty lines in the CSV
@@ -101,35 +116,33 @@ sub parse_cncpo_list {
 				warn "WARNING: dominio non valido per il record $domain";
 				next;
 			}
-			push(@block_domains, $domain);
+			push(@domains, $domain);
 		} elsif ($ip) {
 			if ($ip !~ /^$RE_ipaddr$/o) {
 				warn "WARNING: IP non valido per il record $ip";
 				next;
 			}
-			push(@block_ips, $ip);
+			push(@ips, $ip);
 		} else {
 			warn "WARNING: record vuoto";
 		}
 
 	} # foreach
 
-	return (\@block_domains, \@block_ips);
+	return {
+		number	=> $number + 0,
+		date	=> $timestamp,
+		ips		=> [ uniq @ips ],
+		domains	=> [ uniq @domains ],
+		urls	=> [ uniq @urls ],
+	};
 }
 
 ##############################################################################
 sub parse_csv_file {
 	my ($file) = @_;
 
-	open(my $fh, $file) or die "open($file): $!";
-	my $result = parse_csv($fh);
-	close $fh;
-
-	return $result;
-}
-
-sub parse_csv {
-	my ($fh) = @_;
+	open(my $fh, $file);
 
 	my $csv = Text::CSV->new({
 		binary		=> 1,
@@ -145,6 +158,8 @@ sub parse_csv {
 		push(@list, $row);
 	}
 
+	close $fh;
+
 	if (not $csv->eof) {
 		my ($code, $str, $pos) = $csv->error_diag;
 		die "CSV ERROR: $code - $str at line $pos!\n"
@@ -154,18 +169,24 @@ sub parse_csv {
 }
 
 ##############################################################################
-sub dedupe_list {
-	my ($list) = (@_);
+sub remove_subdomains {
+	my ($l) = @_;
+	return if not $l or not $l->{domains};
 
-	my %hash = map { $_ => undef } @$list;
-	@$list = keys %hash;
-}
+	my $list = $l->{domains};
 
-sub write_list {
-	my ($file, $list) = @_;
+	my %domains = map { $_ => undef } @$list;
 
-	open(my $fh, ">$file") or die "open($file): $!";
-	print $fh join("\n", @$list) . "\n";
-	close $fh or die "close($file): $!";
+	for (my $i = 0; $i < @$list; $i++) {
+		my $domain = $list->[$i];
+		# remove each leading component of the domain and check if the new
+		# resulting domain is in our list
+		while ($domain =~ s/^.+?\.(.+\..+)$/$1/) {
+			delete $list->[$i] if exists $domains{$domain};
+		}
+	}
+
+	# remove the deleted domains from the list
+	$l->{domains} = [ grep { defined $_ } @{ $l->{domains} } ];
 }
 
