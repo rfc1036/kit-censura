@@ -3,23 +3,24 @@
 URL_cncpo='https://195.120.182.203/'
 FILE_cncpo='tmp/blacklist.csv'
 
-CERTS_cncpo='--certificate=cncpo.pem --private-key=cncpo.key --ca-certificate=cncpo-ca.pem'
+CERTS_cncpo='--cert cncpo.pem --key cncpo.key --cacert cncpo-ca.pem --ciphers DES-CBC3-SHA'
 
-WGET_OPTS_cncpo="$CERTS_cncpo"
+CURL_OPTS_cncpo="$CERTS_cncpo"
 
 ##############################################################################
 # be verbose when stdout is a tty
 if [ ! -t 0 ]; then
-  WGET_OPTS_cncpo="$WGET_OPTS_cncpo -q"
+  CURL_OPTS_cncpo="$CURL_OPTS_cncpo --silent --show-error"
 fi
 
 # on this server, bind to a specific IP address
 if [ "$(hostname --fqdn)" = "anubi.seeweb.it" ]; then
-  WGET_OPTS_cncpo="$WGET_OPTS_cncpo --bind-address=212.25.179.125"
+  CURL_OPTS_cncpo="$CURL_OPTS_cncpo --interface 212.25.179.125"
 fi
 
 ## downloading ###############################################################
-wget $WGET_OPTS_cncpo $URL_cncpo -O $FILE_cncpo.tmp
+curl --fail --location --remote-time $CURL_OPTS_cncpo \
+  --output $FILE_cncpo.tmp $URL_cncpo
 mv $FILE_cncpo.tmp $FILE_cncpo
 
 ## parsing ###################################################################

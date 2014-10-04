@@ -3,16 +3,17 @@
 URL_aams='ftp://ftp.finanze.it/pub/monopoli/elenco_siti_inibiti.rtf'
 FILE_aams='tmp/elenco_siti_inibiti.rtf'
 
-WGET_OPTS_aams=''
+CURL_OPTS_aams=''
 
 ##############################################################################
 # be verbose when stdout is a tty
 if [ ! -t 0 ]; then
-  WGET_OPTS_aams="$WGET_OPTS_aams -q"
+  CURL_OPTS_aams="$CURL_OPTS_aams --silent --show-error"
 fi
 
 ## downloading ###############################################################
-wget $WGET_OPTS_aams $URL_aams -O $FILE_aams.tmp
+curl --fail --location --remote-time $CURL_OPTS_aams \
+  --output $FILE_aams.tmp $URL_aams
 mv $FILE_aams.tmp $FILE_aams
 
 ## parsing ###################################################################
