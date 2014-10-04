@@ -2,5 +2,13 @@
 
 FILE_agcom='URL AGCOM.txt'
 
+if [ ! -e "$FILE_agcom" ]; then
+  echo "WARNING: $FILE_agcom does not exist!" >&2
+  if [ ! -e lists/agcom-ip.new ]; then
+    : > lists/agcom-ip.new
+  fi
+  exit 0
+fi
+
 ./parse_agcom "$FILE_agcom" lists/agcom.new lists/agcom-ip.new
 
