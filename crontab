@@ -6,7 +6,7 @@
 MAILTO=noc@example.net
 
 # optionally archive the old lists
-22 10		* * *		savelog -c 90 -l -q -r ../archive/ $HOME/censura/tmp/blacklist.csv
+42 10		* * *		cd $HOME/censura/ && ./archive_lists
 
 # download and parse the lists
 # ... and warn if the list of banned addresses has changed
