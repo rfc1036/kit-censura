@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-FILE_agcom='URL AGCOM.txt'
+FILE_agcom='lista.agcom'
 
 if [ ! -e "$FILE_agcom" ]; then
   echo "WARNING: $FILE_agcom does not exist!" >&2

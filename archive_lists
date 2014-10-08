@@ -2,7 +2,7 @@
 
 [ -d archive/ ] || mkdir archive/
 
-for file in tmp/elenco_siti_inibiti.rtf "URL AGCOM.txt" tmp/blacklist.csv lista.manuale; do
+for file in tmp/elenco_siti_inibiti.rtf tmp/blacklist.csv lista.agcom lista.manuale; do
   [ -s "$file" ] || continue
 
   file_name="${file##*/}"
