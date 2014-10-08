@@ -45,32 +45,38 @@ exit 0;
 ##############################################################################
 sub parse_agcom_file {
 	my ($file) = @_;
+	my ($number, $date_y, $date_m, $date_d);
 
-	open(my $fh, '<:encoding(UTF-16)', $file);
-
-	my $first_line = <$fh>;
-	die "$file is empty!\n" if not $first_line;
-
-	# the first line of the file contains an incremental number and a date
-	my ($number, $date_y, $date_m, $date_d) = $first_line =~ /^
-		\s*
-		(\d+)			# incremental number
-		[\s_]+
-		(\d{4}) [\.:-]+	# year
-		(\d{2}) [\.:-]+	# month
-		(\d{2}) 		# day
-		\s*$
-	/x;
-	die "$file has an invalid header!\n"
-		if not ($number and $date_y and $date_m and $date_d);
+	open(my $fh, '<', $file);
 
 	my (@ips, @domains, @urls);
+	my $state = 0;
 	while (<$fh>) {
 		s/^\s+//;
 		# these two regexps cannot be joined because the last line may lack
 		# the end of line character(s)
 		s/[\r\n]+$//;
 		s/\s*$//;
+
+		# skip empty lines
+		next if /^$/;
+
+		# look for a line containing an incremental number and a date
+		if ($state == 0) {
+			($number, $date_y, $date_m, $date_d) = /^
+				\s*
+				(\d+)					# incremental number
+				[\s_]+
+				(20[12]\d)   [\.:-]+	# year
+				(0\d|1[012]) [\.:-]+	# month
+				([012]\d|3[01])			# day
+				\s*
+			$/x;
+
+			# if found, then start looking for the list entries
+			$state = 1 if $number and $date_y and $date_m and $date_d;
+			next;
+		}
 
 		# normalize some domains which are written as URLs
 		s#^http://($RE{net}{IPv4}|$RE{net}{domain}{-nospace}{-rfc1101})/?$#$1#;
@@ -94,6 +100,9 @@ sub parse_agcom_file {
 	}
 
 	close $fh;
+
+	die "$file has no header!\n"
+		if not ($number and $date_y and $date_m and $date_d);
 
 	die "$file contains no data!\n" if not (@domains or @ips or @urls);
 
