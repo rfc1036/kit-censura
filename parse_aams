@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 # vim: shiftwidth=4 tabstop=4
 #
-# Copyright 2014 by Seeweb s.r.l.
+# Copyright 2014-2015 by Seeweb s.r.l.
 # Written by Marco d'Itri <md@Linux.IT>
 #
 # This program is free software; you can redistribute it and/or modify
@@ -13,7 +13,6 @@ use warnings;
 use strict;
 use autodie;
 
-use Net::LibIDN qw(idn_to_ascii);
 use Regexp::Common 2013031201 qw(net URI);
 use List::MoreUtils qw(uniq);
 use File::Slurp;
@@ -48,37 +47,13 @@ exit 0;
 sub parse_aams_file {
 	my ($file) = @_;
 
-	open(my $fh, '-| :encoding(iso-8859-1)', "unrtf --nopict --text $file");
-
-	my $first_line = <$fh>;
-	die "$file is empty!\n" if not $first_line or not $first_line =~ /UnRTF/;
+	open(my $fh, '<', $file);
 
 	my (@ips, @domains, @urls);
 	while (<$fh>) {
-		next if not s/^\s* \d+ \s+ (.+?) \s*$/$1/x;
-
-		# invoke Net::LibIDN only for non-ASCII data
-		if (/[\x80-\xff]/) {
-			# convert the IDN to ASCII
-			if (m#^(https?://)([^/]+)/#) {
-				my ($proto, $domain) = ($1, $2);
-				my $ascii_domain = idn_to_ascii($domain, 'utf-8');
-				if (not $ascii_domain) {
-					warn "idn_to_ascii($domain) failed";
-					next;
-				}
-				s#^(https?://)([^/]+)/#$proto$ascii_domain/#;
-			} else {
-				$_ = idn_to_ascii($_, 'utf-8');
-				if (not $_) {
-					warn "idn_to_ascii($_) failed";
-					next;
-				}
-			}
-		}
-
-		# normalize some domains which are written as URLs
-		s#^http://($RE{net}{IPv4}|$RE{net}{domain}{-nospace}{-rfc1101})/?$#$1#;
+		s/^\s+//;
+		s/[\r\n\s]+$//;
+		next if not $_;
 
 		if (/^$RE{net}{IPv4}$/) {
 			push(@ips, $_);

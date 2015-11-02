@@ -1,7 +1,9 @@
 #!/bin/sh -e
 
-URL_aams='ftp://ftp.finanze.it/pub/monopoli/elenco_siti_inibiti.rtf'
-FILE_aams='tmp/elenco_siti_inibiti.rtf'
+URL_aams1='https://www1.agenziadoganemonopoli.gov.it/files_siti_inibiti/elenco_siti_inibiti.txt'
+URL_aams2='https://www1.agenziadoganemonopoli.gov.it/files_siti_inibiti/file_controllo.txt'
+FILE_aams1='tmp/elenco_siti_inibiti.txt'
+FILE_aams2='tmp/elenco_siti_inibiti.sha-256'
 
 CURL_OPTS_aams=''
 
@@ -13,9 +15,18 @@ fi
 
 ## downloading ###############################################################
 curl --fail --location --remote-time $CURL_OPTS_aams \
-  --output $FILE_aams.tmp $URL_aams
-mv $FILE_aams.tmp $FILE_aams
+  --output $FILE_aams1.tmp $URL_aams1
+mv $FILE_aams1.tmp $FILE_aams1
+
+curl --fail --location --remote-time $CURL_OPTS_aams2 \
+  --output $FILE_aams2.tmp $URL_aams2
+mv $FILE_aams2.tmp $FILE_aams2
+
+if ! echo "$(cat $FILE_aams2) $FILE_aams1" | sha256sum --check --status; then
+  echo "Invalid SHA-256 checksum for $FILE_aams1!" >&2
+  exit 1
+fi
 
 ## parsing ###################################################################
-./parse_aams $FILE_aams lists/aams.new
+./parse_aams $FILE_aams1 lists/aams.new
 
