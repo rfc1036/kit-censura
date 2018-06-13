@@ -18,7 +18,7 @@ curl --fail --location --remote-time $CURL_OPTS_aams \
   --output $FILE_aams1.tmp $URL_aams1
 mv $FILE_aams1.tmp $FILE_aams1
 
-curl --fail --location --remote-time $CURL_OPTS_aams2 \
+curl --fail --location --remote-time $CURL_OPTS_aams \
   --output $FILE_aams2.tmp $URL_aams2
 mv $FILE_aams2.tmp $FILE_aams2
 
