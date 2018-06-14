@@ -25,7 +25,7 @@ for list in $LISTS; do
 
   mv lists/$list.new lists/$list
 
-  # The by-IP list is generated only be some sources. The program assumes
+  # The by-IP list is generated only by some sources. The program assumes
   # that if the by-name list was generated correctly then this one will
   # have been too.
   if [ -e lists/$list-ip.new ]; then
