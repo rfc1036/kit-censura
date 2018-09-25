@@ -65,11 +65,13 @@ sub parse_agcom_file {
 		if ($state == 0) {
 			($number, $date_y, $date_m, $date_d) = /^
 				\s*
-				(\d+)					# incremental number
+				(\d+)            # incremental number
 				[\s_]+
-				(20[12]\d)   [\.:-]+	# year
-				(0\d|1[012]) [\.:-]+	# month
-				([012]\d|3[01])			# day
+				(20[12]\d)       # year
+				[\.:-]+
+				([012]\d|3[01])  # day
+				[\.:-]+
+				(0\d|1[012])     # month
 				\s*
 			$/x;
 
