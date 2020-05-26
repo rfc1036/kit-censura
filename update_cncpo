@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-URL_cncpo='https://195.120.182.203/'
+URL_cncpo='https://212.14.145.50/'
 FILE_cncpo='tmp/blacklist.csv'
 
 CERTS_cncpo='--cert cncpo.pem --key cncpo.key --cacert cncpo-ca.pem --ciphers DES-CBC3-SHA'
