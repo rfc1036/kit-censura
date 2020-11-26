@@ -60,6 +60,9 @@ sub parse_aams_file {
 			next;
 		}
 
+		# convert URLs with no path to plain domains
+		$_ = $1 if m{^https?://([^/]+)/?$};
+
 		if (/^$RE{net}{domain}{-nospace}{-rfc1101}$/) {
 			push(@domains, lc $_);
 			next;
