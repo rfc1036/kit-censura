@@ -56,6 +56,10 @@ working path:
 
 mkdir tmp lists 
 
+and create the generic lists (if needed):
+
+touch lista.manuale lista.manuale-ip
+
 The install-routes-linux script can be run directly on a border router
 or on a system where a dynamic routing protocol will redistribute the
 static routes it installs.
