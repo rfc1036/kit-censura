@@ -42,7 +42,7 @@ for list in $LISTS; do
   
   # allow manual add of specific IPs if file exists (ex lista.manuale-ip)
   if [ -e lista.$list-ip ]; then
-        cp lista.$list-ip lists/$list-ip
+        egrep '^[^#]' lista.$list-ip > lists/$list-ip
   fi
   
 done
