@@ -42,9 +42,12 @@ unzip CertificatoCA.zip
 openssl x509 -in CertificatoCA.cer -inform DER -out cncpo-ca.pem -outform PEM
 
 
-
 If you already have a certificate in PFX format instead, you can convert
-it to PEM using this command and then separate the public and private keys:
+it to base64 and PEM using this commands and then separate the public, ca and private keys:
 
-openssl pkcs12 -nodes -in cncpo.pfx -out cncpo-full.pem
+openssl enc -base64 -d -in cncpo.pfx -out cncpo-base64.pfx
+openssl pkcs12 -in cncpo-base64.pfx -out cncpo.key -nodes -nocerts
+openssl pkcs12 -in cncpo-base64.pfx -out cncpo.pem -nodes -clcerts
+openssl pkcs12 -in cncpo-base64.pfx -out cncpo-ca.pem -nodes -cacerts
+
 
