@@ -1,14 +1,6 @@
-#!/bin/sh -e
+#!/bin/bash
 
-# path of the file on each target server
-CONFFILE='/etc/bind/censura/named.conf'
-# list of target servers
-SERVERS='root@ns1.example.net root@ns3.example.net root@ns5.example.net root@ns6.example.net'
-# do not waste too much time trying to connect to unresponsive remote servers
-RSYNC_OPTIONS='--timeout=30 -rt'
-
-# the local file
-CONF='lists/named.conf'
+source config.sh
 
 # override the list of target servers
 if [ "$1" ]; then
@@ -23,16 +15,32 @@ copy_config() {
   rc=0
   for server in $SERVERS; do
     dprintf "Copying to $server...\n"
+    
+    for zone in $LISTS; do
+    
+      if [ -e db.$zone ] ; then  
+         if rsync $RSYNC_OPTIONS db.$zone $server:$CONFDIR; then 
+          dprintf "The zone db.$zone has been correctly copied to $server" >&2
+        else
+        
+          dprintf "ERROR: the zone db.$zone has not been correctly copied to $server!" >&2
+        fi
+      fi
+    done
+
+    
+    
     if rsync $RSYNC_OPTIONS $file $server:$CONFFILE; then
       dprintf "Succesfully copied to $server.\n"
+      
       if ssh $server "named-checkconf $CONFFILE && rndc reconfig"; then
         dprintf "Configuration successfully reloaded on $server.\n\n"
       else
-        printf "ERROR: the configuration has not been correctly reloaded on $server!\n\n" >&2
+        dprintf "ERROR: the configuration has not been correctly reloaded on $server!" >&2
 	rc=1
       fi
     else
-      printf "ERROR: the configuration has not been correctly copied to $server!\n\n" >&2
+      dprintf "ERROR: the configuration has not been correctly copied to $server!" >&2
       rc=1
     fi
   done
@@ -44,7 +52,8 @@ if [ -t 0 ]; then VERBOSE=1; fi
 
 dprintf() {
   [ "$VERBOSE" ] || return 0
-  printf "$*"
+  printf "$* \n"
+  test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - $*" >> $LOGFILE
 }
 
 ##############################################################################
@@ -58,10 +67,11 @@ fi
 if cmp -s $CONF $CONF.new; then
   # the new config file is unchanged, we are done
   dprintf "$CONF is unchanged, exiting.\n"
-  exit 0
+ # exit 0
 fi
 
 dprintf "$CONF has changed.\n"
+
 
 # copy named.conf to the servers
 # rename the file only if everything was successful

@@ -1,14 +1,15 @@
-#!/bin/sh -e
+#!/bin/bash
 
-FILE_agcom='lista.agcom'
+source config.sh
 
 if [ ! -e "$FILE_agcom" ]; then
+  test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - WARNING: $FILE_agcom does not exist!" >> $LOGFILE
   echo "WARNING: $FILE_agcom does not exist!" >&2
   if [ ! -e lists/agcom-ip.new ]; then
     : > lists/agcom-ip.new
   fi
   exit 0
 fi
-
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - AGCOM Parsing Started" >> $LOGFILE
 ./parse_agcom "$FILE_agcom" lists/agcom.new lists/agcom-ip.new
 

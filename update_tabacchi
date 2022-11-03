@@ -6,5 +6,6 @@ source common_aams.sh
 
 URL_aams1='https://www1.agenziadoganemonopoli.gov.it/files_siti_inibiti_tabacchi/elenco_siti_inibiti.txt'
 URL_aams2='https://www1.agenziadoganemonopoli.gov.it/files_siti_inibiti_tabacchi/file_controllo.txt'
+
 download_aams lists/tabacchi.new
 

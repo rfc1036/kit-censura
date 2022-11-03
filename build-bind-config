@@ -1,14 +1,12 @@
-#!/bin/sh -e
+#!/bin/bash
 
-# the directory on the name servers containing the zone files
-CONFDIR='/etc/bind/censura'
+source config.sh
 
 if [ -z "$1" ]; then
   echo "Usage: $0 \"LISTS\"" >&2
 fi
 LISTS="$1"
 
-CONF='lists/named.conf'
 
 ##############################################################################
 # Generate a named.conf fragment which creates a dummy zone for each domain

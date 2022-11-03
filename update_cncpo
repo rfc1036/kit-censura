@@ -1,15 +1,6 @@
 #!/bin/bash
 
-URL_cncpo='https://212.14.145.50/'
-FILE_cncpo='tmp/blacklist.csv'
-# insert NOC email to enable alerting
-NOC_EMAIL=''
-FROM_EMAIL='cncpo@connesi.it'
-
-CERTS_cncpo='--cert cncpo.pem --key cncpo.key --cacert cncpo-ca.pem --ciphers DES-CBC3-SHA'
-
-CURL_OPTS_cncpo="$CERTS_cncpo"
-
+source config.sh
 source curl_errors.sh
 
 ##############################################################################
@@ -26,20 +17,27 @@ fi
 ## downloading ###############################################################
 curl --fail --location --remote-time $CURL_OPTS_cncpo \
   --output $FILE_cncpo.tmp $URL_cncpo
+
 CURL_RETURN=$?
 
 mv $FILE_cncpo.tmp $FILE_cncpo
 
 if [ $CURL_RETURN != 0 ] ; then
         SUBJECT="Error while fetching CNCPO lists"
-        TXT="Curl on $(hostname -f) have returned $CURL_RETURN:\n\n${curl_errors[$CURL_RETURN]}\n\n when trying to get $URL_cncpo."
+        TXT="Curl on $(hostname --fqdn) have returned $CURL_RETURN:\n\n${curl_errors[$CURL_RETURN]}\n\n when trying to get $URL_cncpo."
 	if [ "x$NOC_EMAIL" != 'x' ] ; then
         	echo -e "Subject: $SUBJECT\nFrom:$FROM_EMAIL\n$TXT" | sendmail $NOC_EMAIL
 	fi
-        echo "Warning: $TXT"
+        test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - CNCPO Error: $TXT" >> $LOGFILE
+        echo "Warning: $TXT" >&2
+
+else
+     test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - CNCPO List Fetched" >> $LOGFILE
 
 fi
 
 ## parsing ###################################################################
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - CNCPO Parsing Started" >> $LOGFILE
 ./parse_cncpo $FILE_cncpo lists/cncpo.new lists/cncpo-ip.new
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - CNCPO Parsing Completed" >> $LOGFILE
 

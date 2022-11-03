@@ -1,25 +1,33 @@
-#!/bin/sh -e
+#!/bin/bash
 # This master script runs the scripts which download and parse each
 # blacklist.
 # It must not fail even if one of the steps fail.
 
+source config.sh
+
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - $0 process started." >> $LOGFILE  
+
+
 if [ "$1" ]; then
-  LISTS="$1"
-else
-  LISTS="manuale aams tabacchi agcom cncpo"
+  LISTS="$1"  
 fi
 
 # update each list
 for list in $LISTS; do
+
+  test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - updating list $list" >> $LOGFILE 
+
   # download the list and parse it
   if ! ./update_$list; then
     echo "WARNING: $list.update has failed with rc=$?!" >&2
+    test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - WARNING: $list.update has failed with rc=$?!" >> $LOGFILE
     continue
   fi
 
   # second sanity check
   if [ ! -e lists/$list.new ]; then
     echo "WARNING: lists/$list.new has not been created!" >&2
+    test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - WARNING: lists/$list.new has not been created!" >> $LOGFILE
     continue
   fi
 
@@ -34,7 +42,7 @@ for list in $LISTS; do
 done
 
 # If there are any changes, generate (but not upload) a new named.conf file
-# from the intermediate parsed files stored in lists/.
+# from the intermediate parsed files stored in lists/
 ./build-bind-config "$LISTS"
 ./build-unbound-config "$LISTS"
 
