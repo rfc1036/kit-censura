@@ -39,10 +39,10 @@ download_aams() {
   fi
   mv $FILE_aams2.tmp $FILE_aams2
 
-#  if ! echo "$(cat $FILE_aams2) $FILE_aams1" | sha256sum --check --status; then
-#    echo "Invalid SHA-256 checksum for $FILE_aams1!" >&2
-#    exit 1
-#  fi
+  if ! echo "$(cat $FILE_aams2) $FILE_aams1" | sha256sum --check --status; then
+    echo "Invalid SHA-256 checksum for $FILE_aams1!" >&2
+    exit 1
+  fi
 
   ./parse_aams $FILE_aams1 $output
 }
