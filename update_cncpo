@@ -26,7 +26,6 @@ if [ $CURL_RETURN != 0 ] ; then
         SUBJECT="Error while fetching CNCPO lists"
         TXT="Curl on $(hostname --fqdn) have returned $CURL_RETURN:\n\n${curl_errors[$CURL_RETURN]}\n\n when trying to get $URL_cncpo."
 	if [ $ALERT_ENABLE == true ] && [ "x$NOC_EMAIL" != 'x' ] ; then
-
         	echo -e "Subject: $SUBJECT\nFrom:$FROM_EMAIL\n$TXT" | sendmail $NOC_EMAIL
 	fi
         test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - CNCPO Error: $TXT" >> $LOGFILE
