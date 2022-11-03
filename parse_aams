@@ -27,11 +27,11 @@ die "Usage: $0 RTF_INPUT DOMAINS_OUTPUT\n"
 
 my $lists = parse_aams_file($ARGV[0]);
 
-die "Censoring URLs is not supported!\n"
-	if $lists->{urls} and @{ $lists->{urls} };
+#die "Censoring URLs is not supported!\n"
+#	if $lists->{urls} and @{ $lists->{urls} };
 
-die "Censoring IPs is not supported!\n"
-	if $lists->{ips} and @{ $lists->{ips} };
+#die "Censoring IPs is not supported!\n"
+#	if $lists->{ips} and @{ $lists->{ips} };
 
 die "No domains found!\n"
 	if not $lists->{domains} or not @{ $lists->{domains} };

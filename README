@@ -31,7 +31,7 @@ upload-unbound-config: rsync (local and remote), Unbound (remote)
 Copyright 2008-2018 by Seeweb s.r.l.
 Originally Written by Marco d'Itri <md@Linux.IT>.
 
-Modified by Antonio Bartolini <antonio.bartolini@connesi.it>
+Alerting and Logging by Antonio Bartolini <antonio.bartolini@connesi.it>
 
 The author will appreciate receiving success or failure reports about
 the deployment this software.
@@ -47,9 +47,14 @@ the Free Software Foundation; either version 2 of the License, or
 
 ** Usage **
 
-Many scripts contain configuration variables. Read and understand each
-one before before running them.
+Many scripts contain configuration variables that are stored in config.sh. 
+Read and understand each one before before running them.
 Start from censorship-get and then censorship-apply.
+
+Before starting make sure to create the following directories in the 
+working path:
+
+mkdir tmp lists 
 
 The install-routes-linux script can be run directly on a border router
 or on a system where a dynamic routing protocol will redistribute the

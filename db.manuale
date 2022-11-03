@@ -6,6 +6,6 @@ $TTL 5M
                                       4W     ; Expire - 1 week
                                       5M )    ; Minimum
                 NS      localhost.
-                A               217.175.53.228
-        IN      A               217.175.53.228
-*       IN      A               217.175.53.228
+                A               0.0.0.0
+        IN      A               0.0.0.0
+*       IN      A               0.0.0.0

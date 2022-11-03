@@ -64,7 +64,7 @@ sub parse_cncpo_list {
 		if not $number or $number !~ /^\d+$/;
 	die "Missing timestamp!\n"
 		if not $timestamp or $timestamp !~ /^\d+$/;
-
+		
 	foreach my $row (@$list) {
 		next if @$row == 1;				# skip empty lines in the CSV
 		my ($url, $domain, $ipurl, $ip) = @$row;

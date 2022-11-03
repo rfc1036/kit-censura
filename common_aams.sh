@@ -1,8 +1,6 @@
-CURL_OPTS_aams=''
-# insert NOC email to enable alerting
-NOC_EMAIL=''
-FROM_EMAIL='alerting@connesi.it'
+#!/bin/bash
 
+source config.sh
 source curl_errors.sh
 
 # be verbose when stdout is a tty
@@ -22,7 +20,7 @@ download_aams() {
   if [ $CURL_RETURN != 0 ] ; then
         SUBJECT="Error while fetching Censura lists"
         TXT="Curl on $(hostname -f) have returned $CURL_RETURN:\n\n${curl_errors[$CURL_RETURN]}\n\n when trying to get $URL_aams1."
-	if [ "x$NOC_EMAIL" != 'x' ] ; then
+	if [ $ALERT_ENABLE == true ] && [ "x$NOC_EMAIL" != 'x' ] ; then
         	echo -e "Subject: $SUBJECT\nFrom:$FROM_EMAIL\n$TXT" | sendmail $NOC_EMAIL
 	fi
 	echo "Warning: $TXT" >&2
@@ -36,7 +34,7 @@ download_aams() {
   if [ $CURL_RETURN != 0 ] ; then
         SUBJECT="Error while fetching Censura lists"
         TXT="Curl on $(hostname -f) have returned $CURL_RETURN:\n\n${curl_errors[$CURL_RETURN]}\n\n when trying to get $URL_aams2."
- 	if [ "x$NOC_EMAIL" != 'x' ] ; then
+ 	if [ $ALERT_ENABLE == true ] && [ "x$NOC_EMAIL" != 'x' ] ; then
         	echo -e "Subject: $SUBJECT\nFrom:$FROM_EMAIL\n$TXT" | sendmail $NOC_EMAIL
 	fi
 	echo "Warning: $TXT" >&2
@@ -44,16 +42,20 @@ download_aams() {
   fi
   mv $FILE_aams2.tmp $FILE_aams2
 
-  if ! echo "$(cat $FILE_aams2) $FILE_aams1" | sha256sum --check --status; then
+
+  if [ $SKIP_SHA256_CKSUM != true ] && ! echo "$(cat $FILE_aams2) $FILE_aams1" | sha256sum --check --status ; then
     TXT="Invalid SHA-256 checksum for $FILE_aams1!"
     SUBJECT="Error while fetching AAMS lists"
+    test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Invalid SHA-256 checksum for $output!" >> $LOGFILE
     echo "Invalid SHA-256 checksum for $FILE_aams1!" >&2
-    if [ "x$NOC_EMAIL" != 'x' ] ; then 
+    if [ $ALERT_ENABLE == true ] && [ "x$NOC_EMAIL" != 'x' ] ; then 
     	echo -e "Subject: $SUBJECT\nFrom:$FROM_EMAIL\n$TXT" | sendmail $NOC_EMAIL
     fi 
     exit 1
   fi
 
+  test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Parsing Started for file $output" >> $LOGFILE
   ./parse_aams $FILE_aams1 $output
+  test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Parsing Ended for file $output" >> $LOGFILE
 }
 

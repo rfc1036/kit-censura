@@ -1,9 +1,15 @@
-#!/bin/sh -e
+#!/bin/bash
 
-if [ -e lista.manuale ]; then
-  egrep '^[^#]' lista.manuale > lists/manuale.new.tmp
+source config.sh
+
+if [ -e "$FILE_manuale" ]; then
+  egrep '^[^#]' $FILE_manuale > lists/manuale.new.tmp
   mv lists/manuale.new.tmp lists/manuale.new
 elif [ ! -e lists/manuale.new ]; then
   : > lists/manuale.new
 fi
 
+## parsing ###################################################################
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Manuale Parsing Started" >> $LOGFILE
+./parse_aams $FILE_manuale lists/manuale.new
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Manuale Parsing Completed" >> $LOGFILE

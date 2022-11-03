@@ -1,8 +1,11 @@
-#!/bin/sh -e
+#!/bin/bash
 # This master script runs the scripts which implement by-name and by-IP
 # censorship.
 # It must not fail even if one of the steps fail.
 
+source config.sh
+
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - uploading bind config" >> $LOGFILE 
 ./upload-bind-config || true
 #./upload-unbound-config || true
 ./install-routes-linux || true
