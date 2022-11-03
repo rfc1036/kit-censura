@@ -39,6 +39,12 @@ for list in $LISTS; do
   if [ -e lists/$list-ip.new ]; then
     mv lists/$list-ip.new lists/$list-ip
   fi
+  
+  # allow manual add of specific IPs if file exists (ex lista.manuale-ip)
+  if [ -e lista.$list-ip ]; then
+        cp lista.$list-ip lists/$list-ip
+  fi
+  
 done
 
 # If there are any changes, generate (but not upload) a new named.conf file
