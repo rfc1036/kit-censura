@@ -5,7 +5,7 @@
 
 source config.sh
 
-test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - $0 process started." >> $LOGFILE  
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Censorship GET started." >> $LOGFILE  
 
 
 if [ "$1" ]; then
@@ -46,3 +46,4 @@ done
 ./build-bind-config "$LISTS"
 ./build-unbound-config "$LISTS"
 
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Censorship GET ended." >> $LOGFILE 

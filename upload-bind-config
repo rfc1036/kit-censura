@@ -31,10 +31,10 @@ copy_config() {
     
     
     if rsync $RSYNC_OPTIONS $file $server:$CONFFILE; then
-      dprintf "Succesfully copied to $server.\n"
+      dprintf "Succesfully copied to $server."
       
       if ssh $server "named-checkconf $CONFFILE && rndc reconfig"; then
-        dprintf "Configuration successfully reloaded on $server.\n\n"
+        dprintf "Configuration successfully reloaded on $server."
       else
         dprintf "ERROR: the configuration has not been correctly reloaded on $server!" >&2
 	rc=1
@@ -66,11 +66,11 @@ fi
 ##############################################################################
 if cmp -s $CONF $CONF.new; then
   # the new config file is unchanged, we are done
-  dprintf "$CONF is unchanged, exiting.\n"
- # exit 0
+  dprintf "$CONF is unchanged, exiting."
+  exit 0
 fi
 
-dprintf "$CONF has changed.\n"
+dprintf "$CONF has changed."
 
 
 # copy named.conf to the servers
