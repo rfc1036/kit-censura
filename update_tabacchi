@@ -1,8 +1,8 @@
-#!/bin/sh -e
+#!/bin/bash
 # Documented on:
 # https://www1.agenziadoganemonopoli.gov.it/siti_inibiti_tabacchi.htm
 
-. ./common_aams.sh
+source common_aams.sh
 
 URL_aams1='https://www1.agenziadoganemonopoli.gov.it/files_siti_inibiti_tabacchi/elenco_siti_inibiti.txt'
 URL_aams2='https://www1.agenziadoganemonopoli.gov.it/files_siti_inibiti_tabacchi/file_controllo.txt'
