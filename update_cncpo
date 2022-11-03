@@ -2,7 +2,8 @@
 
 URL_cncpo='https://212.14.145.50/'
 FILE_cncpo='tmp/blacklist.csv'
-NOC_EMAIL='noc@connesi.it'
+# insert NOC email to enable alerting
+NOC_EMAIL=''
 FROM_EMAIL='cncpo@connesi.it'
 
 CERTS_cncpo='--cert cncpo.pem --key cncpo.key --cacert cncpo-ca.pem --ciphers DES-CBC3-SHA'
@@ -32,7 +33,9 @@ mv $FILE_cncpo.tmp $FILE_cncpo
 if [ $CURL_RETURN != 0 ] ; then
         SUBJECT="Error while fetching CNCPO lists"
         TXT="Curl on $(hostname -f) have returned $CURL_RETURN:\n\n${curl_errors[$CURL_RETURN]}\n\n when trying to get $URL_cncpo."
-        echo -e "Subject: $SUBJECT\nFrom:$FROM_EMAIL\n$TXT" | sendmail $NOC_EMAIL
+	if [ "x$NOC_EMAIL" != 'x' ] ; then
+        	echo -e "Subject: $SUBJECT\nFrom:$FROM_EMAIL\n$TXT" | sendmail $NOC_EMAIL
+	fi
         echo "Warning: $TXT"
 
 fi
