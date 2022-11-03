@@ -5,8 +5,9 @@
 
 source config.sh
 
-test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - uploading bind config" >> $LOGFILE 
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Censorship APPLY started." >> $LOGFILE  
 ./upload-bind-config || true
 #./upload-unbound-config || true
 ./install-routes-linux || true
 
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Censorship APPLY ended." >> $LOGFILE
