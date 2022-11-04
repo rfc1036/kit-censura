@@ -14,7 +14,7 @@ copy_config() {
 
   rc=0
   for server in $SERVERS; do
-    dprintf "Copying to $server...\n"
+    dprintf "Copying to $server..."
     
     for zone in $LISTS; do
     
