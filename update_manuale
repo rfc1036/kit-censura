@@ -13,7 +13,7 @@ fi
 
 # allow manual add of specific IPs if file exists (ex lista.manuale-ip)
   if [ -e $FILE_manuale-ip ]; then
-        egrep '^[^#]' $FILE_manuale-ip | sort | uniq > lists/$list-ip
+        egrep '^[^#]' $FILE_manuale-ip | sort | uniq > lists/manuale-ip
 	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Imported list of IP  $FILE_manuale-ip" >> $LOGFILE
   fi
 
