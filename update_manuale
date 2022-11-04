@@ -2,6 +2,8 @@
 
 source config.sh
 
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Import Manuale" >> $LOGFIL
+
 if [ -e "$FILE_manuale" ]; then
   egrep '^[^#]' $FILE_manuale > lists/manuale.new.tmp
   mv lists/manuale.new.tmp lists/manuale.new
@@ -9,7 +11,4 @@ elif [ ! -e lists/manuale.new ]; then
   : > lists/manuale.new
 fi
 
-## parsing ###################################################################
-test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Manuale Parsing Started" >> $LOGFILE
-./parse_aams $FILE_manuale lists/manuale.new
-test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Manuale Parsing Completed" >> $LOGFILE
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Manuale Import Completed" >> $LOGFILE
