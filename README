@@ -64,6 +64,18 @@ The install-routes-linux script can be run directly on a border router
 or on a system where a dynamic routing protocol will redistribute the
 static routes it installs.
 
+** Logging and Alerting **
+
+You can enable Logging and Alerting by changing config.sh file.
+By default the log file is placed on /var/log/kit-censura.log
+
+If log rotation is needed there is a template for logrotate in 
+kit-censura.logrotate file ready to be edited and moved on 
+logrotate.d directory.
+
+Alerting is triggered only when downloads fails for some reasons and
+send an email of warning at the address specified in config.sh file.
+Just be sure that sendmail tool is working propely.
 
 ** Name servers configuration **
 
