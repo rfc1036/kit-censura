@@ -2,13 +2,19 @@
 
 source config.sh
 
-test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Import Manuale" >> $LOGFILE
 
 if [ -e "$FILE_manuale" ]; then
   egrep '^[^#]' $FILE_manuale | sort | uniq > lists/manuale.new.tmp
   mv lists/manuale.new.tmp lists/manuale.new
+   test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Imported list of IP  $FILE_manuale" >> $LOGFILE
 elif [ ! -e lists/manuale.new ]; then
   : > lists/manuale.new
 fi
 
-test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Manuale Import Completed" >> $LOGFILE
+# allow manual add of specific IPs if file exists (ex lista.manuale-ip)
+  if [ -e $FILE_manuale-ip ]; then
+        egrep '^[^#]' $FILE_manuale-ip | sort | uniq > lists/$list-ip
+	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Imported list of IP  $FILE_manuale-ip" >> $LOGFILE
+  fi
+
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Import manuale Completed" >> $LOGFILE
