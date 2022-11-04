@@ -20,9 +20,8 @@ copy_config() {
     
       if [ -e db.$zone ] ; then  
          if rsync $RSYNC_OPTIONS db.$zone $server:$CONFDIR; then 
-          dprintf "The zone db.$zone has been correctly copied to $server" >&2
+          dprintf "The zone db.$zone has been correctly copied to $CONFDIR on $server" >&2
         else
-        
           dprintf "ERROR: the zone db.$zone has not been correctly copied to $server!" >&2
         fi
       fi
