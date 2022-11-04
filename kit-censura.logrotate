@@ -1,0 +1,6 @@
+/var/log/kit-censura.log {
+        monthly
+        missingok
+        compress
+        rotate 24
+}
