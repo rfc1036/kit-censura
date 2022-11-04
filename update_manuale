@@ -5,7 +5,7 @@ source config.sh
 test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Import Manuale" >> $LOGFILE
 
 if [ -e "$FILE_manuale" ]; then
-  egrep '^[^#]' $FILE_manuale > lists/manuale.new.tmp
+  egrep '^[^#]' $FILE_manuale | sort | uniq > lists/manuale.new.tmp
   mv lists/manuale.new.tmp lists/manuale.new
 elif [ ! -e lists/manuale.new ]; then
   : > lists/manuale.new
