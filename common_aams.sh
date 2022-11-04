@@ -24,7 +24,8 @@ download_aams() {
         	echo -e "Subject: $SUBJECT\nFrom:$FROM_EMAIL\n$TXT" | sendmail $NOC_EMAIL
 	fi
 	echo "Warning: $TXT" >&2
-
+  else	
+	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Successfully downloaded file $URL_aams1" >> $LOGFILE	
   fi
   mv $FILE_aams1.tmp $FILE_aams1
 
@@ -38,6 +39,8 @@ download_aams() {
         	echo -e "Subject: $SUBJECT\nFrom:$FROM_EMAIL\n$TXT" | sendmail $NOC_EMAIL
 	fi
 	echo "Warning: $TXT" >&2
+  else
+	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Successfully downloaded file $URL_aams2" >> $LOGFILE
 
   fi
   mv $FILE_aams2.tmp $FILE_aams2
