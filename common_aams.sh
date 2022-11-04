@@ -57,8 +57,12 @@ download_aams() {
     exit 1
   fi
 
-  test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Parsing Started for file $output" >> $LOGFILE
-  ./parse_aams $FILE_aams1 $output
-  test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Parsing Ended for file $output" >> $LOGFILE
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Parsing Started for file $output" >> $LOGFILE
+./parse_aams $FILE_aams1 $output 2>&1 | tee -a $LOGFILE
+if [ $? == 0 ] ; then
+	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Parsing Ended for file $output" >> $LOGFILE
+else
+	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Error while Parsing $FILE_aams1" >> $LOGFILE
+fi
 }
 

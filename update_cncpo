@@ -38,6 +38,10 @@ fi
 
 ## parsing ###################################################################
 test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - CNCPO Parsing Started" >> $LOGFILE
-./parse_cncpo $FILE_cncpo lists/cncpo.new lists/cncpo-ip.new
-test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - CNCPO Parsing Completed" >> $LOGFILE
+./parse_cncpo $FILE_cncpo lists/cncpo.new lists/cncpo-ip.new 2>&1 | tee -a $LOGFILE
+if [ $? == 0 ] ; then
+	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - CNCPO Parsing Completed" >> $LOGFILE
+else
+	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Error while Parsing CNCPO Lists" >> $LOGFILE
+fi
 
