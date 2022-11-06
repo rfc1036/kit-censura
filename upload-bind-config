@@ -47,10 +47,10 @@ copy_config() {
   return $rc
 }
 
-if [ -t 0 ]; then VERBOSE=1; fi
+#if [ -t 0 ]; then VERBOSE=1; fi
 
 dprintf() {
-  [ "$VERBOSE" ] || return 0
+#  [ "$VERBOSE" ] || return 0
   printf "$* \n"
   test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - $*" >> $LOGFILE
 }
