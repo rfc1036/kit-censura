@@ -3,14 +3,10 @@
 source common_aams.sh
 
 
-BASE=""
 ELENCO=$(wget -q https://www.adm.gov.it/portale/siti-web-inibiti-giochi -O - | grep txt | grep -i Elenco | cut -d\" -f2)
 CONTROLLO=$(wget -q https://www.adm.gov.it/portale/siti-web-inibiti-giochi -O - | grep txt | grep -i Controllo | cut -d\" -f2)
 
-#URL_aams1='https://www1.adm.gov.it/files_siti_inibiti/elenco_siti_inibiti.txt'
-#URL_aams2='https://www1.adm.gov.it/files_siti_inibiti/file_controllo.txt'
+URL_aams="https://www.adm.gov.it/portale/siti-web-inibiti-giochi"
 
-URL_aams1="https://www.adm.gov.it$ELENCO"
-URL_aams2="https://www.adm.gov.it$CONTROLLO"
 download_aams lists/aams.new
 
