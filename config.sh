@@ -4,7 +4,7 @@
 ##############################
 
 # Lists to be processed
-LISTS="manuale aams tabacchi agcom cncpo"
+LISTS="manuale aams tabacchi agcom cncpo consob"
 
 # CNCPO URL
 URL_cncpo='https://212.14.145.50/'
@@ -17,6 +17,9 @@ FILE_agcom='lista.agcom'
 
 # Skip SHA256 Checks 
 SKIP_SHA256_CKSUM=false
+
+# Local file for Consob list
+FILE_consob='lista.consob'
 
 # Local file for Manuale
 FILE_manuale='lista.manuale'

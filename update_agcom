@@ -11,5 +11,5 @@ if [ ! -e "$FILE_agcom" ]; then
   exit 0
 fi
 test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - AGCOM Parsing Started" >> $LOGFILE
-./parse_agcom "$FILE_agcom" lists/agcom.new lists/agcom-ip.new
-
+#./parse_agcom "$FILE_agcom" lists/agcom.new lists/agcom-ip.new
+./parse_aams "$FILE_agcom" lists/agcom.new
