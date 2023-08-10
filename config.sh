@@ -13,12 +13,14 @@ URL_cncpo='https://212.14.145.50/'
 FILE_cncpo='tmp/blacklist.csv'
 
 # Local File for AGCOM
+# To be manyally updated from https://www.agcom.it/provvedimenti-a-tutela-del-diritto-d-autore
 FILE_agcom='lista.agcom'
 
 # Skip SHA256 Checks 
 SKIP_SHA256_CKSUM=false
 
 # Local file for Consob list
+# To be manully updated from https://www.consob.it/web/area-pubblica/oscuramenti
 FILE_consob='lista.consob'
 
 # Local file for Manuale
