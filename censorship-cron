@@ -1,0 +1,7 @@
+#!/bin/bash
+
+cd /root/kit-censura
+./censorship-get
+./censorship-summary
+./censorship-apply
+

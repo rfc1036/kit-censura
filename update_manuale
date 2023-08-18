@@ -4,7 +4,7 @@ source config.sh
 
 
 if [ -e "$FILE_manuale" ]; then
-  egrep '^[^#]' $FILE_manuale | sort | uniq > lists/manuale.new.tmp
+  egrep '^[^#]' $FILE_manuale | sed 's~http[s]*://~~g' | sort | uniq > lists/manuale.new.tmp
   mv lists/manuale.new.tmp lists/manuale.new
    test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Imported list of IP  $FILE_manuale" >> $LOGFILE
 elif [ ! -e lists/manuale.new ]; then
