@@ -27,7 +27,7 @@ FILE_consob='lista.consob'
 FILE_manuale='lista.manuale'
 
 # curl options
-CERTS_cncpo='--cert cncpo.pem --key cncpo.key --cacert cncpo-ca.pem --ciphers DES-CBC3-SHA'
+CERTS_cncpo='--cert cncpo.pem --key cncpo.key --cacert cncpo-ca.pem'
 
 # curl options for cncpo
 CURL_OPTS_cncpo="$CERTS_cncpo"
