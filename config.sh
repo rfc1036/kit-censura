@@ -4,7 +4,8 @@
 ##############################
 
 # Lists to be processed
-LISTS="manuale aams tabacchi agcom cncpo consob"
+# Currently available options are: manuale aams tabacchi agcom cncpo consob
+LISTS="manuale aams tabacchi agcom cncpo"
 
 # CNCPO URL
 URL_cncpo='https://212.14.145.50/'
@@ -21,6 +22,7 @@ SKIP_SHA256_CKSUM=false
 
 # Local file for Consob list
 # To be manully updated from https://www.consob.it/web/area-pubblica/oscuramenti
+# -- Not mandatory until explicit request from Consob --
 FILE_consob='lista.consob'
 
 # Local file for Manuale
