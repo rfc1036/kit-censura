@@ -5,7 +5,7 @@
 
 source config.sh
 
-test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Censorship GET started." >> $LOGFILE  
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Censorship GET started." >> $LOGFILE  
 
 
 if [ "$1" ]; then
@@ -15,19 +15,19 @@ fi
 # update each list
 for list in $LISTS; do
 
-  test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - updating list $list" >> $LOGFILE 
+  test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - updating list $list" >> $LOGFILE 
 
   # download the list and parse it
   if ! ./update_$list; then
     echo "WARNING: $list.update has failed with rc=$?!" >&2
-    test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - WARNING: $list.update has failed with rc=$?!" >> $LOGFILE
+    test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - WARNING: $list.update has failed with rc=$?!" >> $LOGFILE
     continue
   fi
 
   # second sanity check
   if [ ! -e lists/$list.new ]; then
     echo "WARNING: lists/$list.new has not been created!" >&2
-    test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - WARNING: lists/$list.new has not been created!" >> $LOGFILE
+    test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - WARNING: lists/$list.new has not been created!" >> $LOGFILE
     continue
   fi
 
@@ -48,4 +48,4 @@ done
 ./build-bind-config "$LISTS"
 ./build-unbound-config "$LISTS"
 
-test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Censorship GET ended." >> $LOGFILE 
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Censorship GET ended." >> $LOGFILE 

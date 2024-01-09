@@ -1,0 +1,40 @@
+
+Piracy Shield Client by AIIP Integration
+
+
+** Prerequisites **
+
+First you need a fully installed instance of the Piracy Shield Client. This software is reserved for members of AIIP (Associazione Italiana Internet Providers).
+In this example we assume that the docker instance is running and the client can be invoked by CLI.
+
+
+** Configuration File **
+
+
+In config.sh you need to add "pscaiip" list in the LISTS variable and add the paths for the lists:
+
+# Local file for Piracy Shield Client by AAIP
+PATH_pscaiip='/opt/piracy-shield-agent-main/'
+
+# Run command for Piracy Shield Client
+CMD_pscaiip
+
+# List name
+FILE_pscaiip='lista.pscaiip' 
+
+# File Paths
+PATH_pscaiip_fqdn='/opt/piracy-shield-agent-main/src/storage/app/fqdn/last.txt'
+PATH_pscaiip_ipv4='/opt/piracy-shield-agent-main/src/storage/app/ipv4/last.txt'
+PATH_pscaiip_ipv6='/opt/piracy-shield-agent-main/src/storage/app/ipv6/last.txt'
+
+
+** Cron requirements **
+Since the Piracy Shield Client need to be invoked more frequently than the kit-censura itself, two commands need to be invoked via cron.
+
+	# run every 6 hours
+	27  */6  * * *     root   /root/kit-censura/censorship-cron  &> /dev/null
+
+	# run every 5 minutes
+	*/5  *  * * *   root    /root/kit-censura/censorship-cron-pscaiip  &> /dev/null
+
+

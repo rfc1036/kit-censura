@@ -5,13 +5,8 @@
 
 MAILTO=noc@example.net
 
-# optionally archive the old lists
-42 10		* * *		cd $HOME/censura/ && ./archive_lists
+# run every 6 hours 
+27  */6  * * *     root   /root/kit-censura/censorship-cron  &> /dev/null
 
-# download and parse the lists
-# ... and warn if the list of banned addresses has changed
-26 10		* * *		cd $HOME/censura/ && ./censorship-get && DRY_RUN=1 ./install-routes-linux
-
-# apply the changes, if any
-17 15		* * *		cd $HOME/censura/ && ./censorship-apply
-
+# run every 5 minutes
+*/5  *  * * *   root    /root/kit-censura/censorship-cron-pscaiip  &> /dev/null

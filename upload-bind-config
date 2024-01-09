@@ -52,7 +52,7 @@ copy_config() {
 dprintf() {
 #  [ "$VERBOSE" ] || return 0
   printf "$* \n"
-  test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - $*" >> $LOGFILE
+  test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - $*" >> $LOGFILE
 }
 
 ##############################################################################
