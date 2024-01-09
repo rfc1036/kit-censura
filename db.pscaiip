@@ -6,6 +6,6 @@ $TTL 5M
                                       4W     ; Expire - 1 week
                                       5M )    ; Minimum
                 NS      localhost.
-                A               109.73.81.54
-        IN      A               109.73.81.54
-*       IN      A               109.73.81.54
+                A               0.0.0.0
+        IN      A               0.0.0.0
+*       IN      A               0.0.0.0
