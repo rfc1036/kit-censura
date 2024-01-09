@@ -5,16 +5,6 @@
 cd /root/kit-censura
 source config.sh
 
-cd $PATH_pscaiip
-
-test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Invoking AAIP Privacy Shield Client" >> $LOGFILE
-docker-compose exec app bash -c "php application schedule:run" >> $LOGFILE
-test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - AAIP Privacy Shield Client Ended" >> $LOGFILE
-
-# Modify according to your installation
-cd /root/kit-censura
-
-
 list=pscaiip
 
 test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - updating list $list" >> $LOGFILE
