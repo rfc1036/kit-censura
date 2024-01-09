@@ -1,0 +1,44 @@
+#!/bin/bash
+source config.sh
+
+cd /opt/piracy-shield-agent-main/
+
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Invoking AAIP Privacy Shield Client" >> $LOGFILE
+docker-compose exec app bash -c "php application schedule:run" >> $LOGFILE
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - AAIP Privacy Shield Client Ended" >> $LOGFILE
+
+cd /root/kit-censura
+
+
+list=pscaiip
+
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - updating list $list" >> $LOGFILE
+
+# download the list and parse it
+if ! ./update_$list; then
+    echo "WARNING: $list.update has failed with rc=$?!" >&2
+    test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - WARNING: $list.update has failed with rc=$?!" >> $LOGFILE
+    continue
+fi
+
+ # second sanity check
+if [ ! -e lists/$list.new ]; then
+    echo "WARNING: lists/$list.new has not been created!" >&2
+    test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - WARNING: lists/$list.new has not been created!" >> $LOGFILE
+    continue
+fi
+
+mv lists/$list.new lists/$list
+
+# The by-IP list is generated only by some sources. The program assumes
+# that if the by-name list was generated correctly then this one will
+# have been too.
+if [ -e lists/$list-ip.new ]; then
+  mv lists/$list-ip.new lists/$list-ip
+fi
+
+./build-bind-config "$LISTS"
+./build-unbound-config "$LISTS"
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Censorship GET $list ended." >> $LOGFILE
+
+./censorship-apply

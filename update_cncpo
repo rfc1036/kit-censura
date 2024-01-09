@@ -28,20 +28,20 @@ if [ $CURL_RETURN != 0 ] ; then
 	if [ $ALERT_ENABLE == true ] && [ "x$NOC_EMAIL" != 'x' ] ; then
         	echo -e "Subject: $SUBJECT\nFrom:$FROM_EMAIL\n$TXT" | sendmail $NOC_EMAIL
 	fi
-        test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - CNCPO Error: $TXT" >> $LOGFILE
+        test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - CNCPO Error: $TXT" >> $LOGFILE
         echo "Warning: $TXT" >&2
 
 else
-     test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Successfully downloaded CNCPO lists" >> $LOGFILE
+     test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Successfully downloaded CNCPO lists" >> $LOGFILE
 
 fi
 
 ## parsing ###################################################################
-test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - CNCPO Parsing Started" >> $LOGFILE
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - CNCPO Parsing Started" >> $LOGFILE
 ./parse_cncpo $FILE_cncpo lists/cncpo.new lists/cncpo-ip.new 2>&1 | tee -a $LOGFILE
 if [ $? == 0 ] ; then
-	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - CNCPO Parsing Completed" >> $LOGFILE
+	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - CNCPO Parsing Completed" >> $LOGFILE
 else
-	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Error while Parsing CNCPO Lists" >> $LOGFILE
+	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Error while Parsing CNCPO Lists" >> $LOGFILE
 fi
 

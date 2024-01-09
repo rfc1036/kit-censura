@@ -31,7 +31,7 @@ fi
         fi
         echo "Warning: $TXT" >&2
   else
-        test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Successfully downloaded file $URL_aams" >> $LOGFILE
+        test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Successfully downloaded file $URL_aams" >> $LOGFILE
   fi
   mv $FILE_aams0.tmp $FILE_aams0
 
@@ -52,7 +52,7 @@ fi
 	fi
 	echo "Warning: $TXT" >&2
   else	
-	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Successfully downloaded file $URL_aams1" >> $LOGFILE	
+	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Successfully downloaded file $URL_aams1" >> $LOGFILE	
   fi
   mv $FILE_aams1.tmp $FILE_aams1
 
@@ -67,7 +67,7 @@ fi
 	fi
 	echo "Warning: $TXT" >&2
   else
-	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Successfully downloaded file $URL_aams2" >> $LOGFILE
+	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Successfully downloaded file $URL_aams2" >> $LOGFILE
 
   fi
   mv $FILE_aams2.tmp $FILE_aams2
@@ -76,7 +76,7 @@ fi
   if [ $SKIP_SHA256_CKSUM != true ] && ! echo "$(cat $FILE_aams2) $FILE_aams1" | sha256sum --check --status ; then
     TXT="Invalid SHA-256 checksum for $FILE_aams1!"
     SUBJECT="Error while fetching AAMS lists"
-    test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Invalid SHA-256 checksum for $output!" >> $LOGFILE
+    test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Invalid SHA-256 checksum for $output!" >> $LOGFILE
     echo "Invalid SHA-256 checksum for $FILE_aams1!" >&2
     if [ $ALERT_ENABLE == true ] && [ "x$NOC_EMAIL" != 'x' ] ; then 
     	echo -e "Subject: $SUBJECT\nFrom:$FROM_EMAIL\n$TXT" | sendmail $NOC_EMAIL
@@ -84,12 +84,12 @@ fi
     exit 1
   fi
 
-test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Parsing Started for file $output" >> $LOGFILE
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Parsing Started for file $output" >> $LOGFILE
 ./parse_aams $FILE_aams1 $output 2>&1 | tee -a $LOGFILE
 if [ $? == 0 ] ; then
-	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Parsing Ended for file $output" >> $LOGFILE
+	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Parsing Ended for file $output" >> $LOGFILE
 else
-	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Error while Parsing $FILE_aams1" >> $LOGFILE
+	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Error while Parsing $FILE_aams1" >> $LOGFILE
 fi
 }
 

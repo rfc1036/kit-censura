@@ -4,8 +4,15 @@
 ##############################
 
 # Lists to be processed
-# Currently available options are: manuale aams tabacchi agcom cncpo consob
-LISTS="manuale aams tabacchi agcom cncpo"
+# Currently available options are: 
+# manuale - For manually added FQDN or IPv4 
+# aams - For AAMS Lists
+# tabacchi - For ADM Lists (Tobacco and Gambling)
+# agcom - For AGCOM Lists (Copyright infringment)
+# cncpo - For CNCPO Lists (anti-pedophilia)
+# consob - For CONSOB Lists (Trading)
+# pscaiip - For Privacy Shield FQDN or IPv4 created by exteral tool provided by AIIP (Associazione Italiana Internet Provider)
+LISTS="manuale aams tabacchi agcom cncpo pscaiip"
 
 # CNCPO URL
 URL_cncpo='https://212.14.145.50/'
@@ -27,6 +34,12 @@ FILE_consob='lista.consob'
 
 # Local file for Manuale
 FILE_manuale='lista.manuale'
+
+# Local file for Piracy Shield Client by AIIP
+FILE_pscaiip='lista.pscaiip'
+PATH_pscaiip_fqdn='/opt/piracy-shield-agent-main/src/storage/app/fqdn/last.txt'
+PATH_pscaiip_ipv4='/opt/piracy-shield-agent-main/src/storage/app/ipv4/last.txt'
+PATH_pscaiip_ipv6='/opt/piracy-shield-agent-main/src/storage/app/ipv6/last.txt'
 
 # curl options
 CERTS_cncpo='--cert cncpo.pem --key cncpo.key --cacert cncpo-ca.pem'

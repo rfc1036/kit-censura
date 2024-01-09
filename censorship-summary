@@ -6,13 +6,13 @@ if [  $LOGGING_ENABLE == false ] ; then
 	exit
 fi
 
-echo "$(date '+%d/%m/%y %H:%m:%S') - Censorship Summary started." >> $LOGFILE
+echo "$(date '+%d/%m/%y %H:%M:%S') - Censorship Summary started." >> $LOGFILE
 
 TOTAL=0
 for list in $LISTS; do
 	RECORDS=$(cat lists/$list | sort | uniq | wc -l | cut -d\  -f1)
-	echo "$(date '+%d/%m/%y %H:%m:%S') - List $list - No.Records: $RECORDS" >> $LOGFILE	
+	echo "$(date '+%d/%m/%y %H:%M:%S') - List $list - No.Records: $RECORDS" >> $LOGFILE	
 	(((TOTAL = TOTAL+RECORDS)))	
 done
-echo "$(date '+%d/%m/%y %H:%m:%S') - Total urls: $TOTAL." >> $LOGFILE
-echo "$(date '+%d/%m/%y %H:%m:%S') - Censorship Summary ended." >> $LOGFILE
+echo "$(date '+%d/%m/%y %H:%M:%S') - Total urls: $TOTAL." >> $LOGFILE
+echo "$(date '+%d/%m/%y %H:%M:%S') - Censorship Summary ended." >> $LOGFILE

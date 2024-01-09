@@ -6,7 +6,7 @@
 # Set $DRY_RUN to only get a summary of the changes which would be applied.
 
 source config.sh
-test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Install Routes Linux Started" >> $LOGFILE
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Install Routes Linux Started" >> $LOGFILE
 
 ##############################################################################
 if [ -t 0 ]; then VERBOSE=1; fi
@@ -37,12 +37,12 @@ if [ -s tmp/routes.added ]; then
   dprintf "Routes to add:\n"
   while read ip; do
     dprintf "$ip\n"
-    test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Added route for IP $ip" >> $LOGFILE
+    test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Added route for IP $ip" >> $LOGFILE
     [ "$DRY_RUN" ] && continue
     ip route add "$ip" via $BLACKHOLE_NEXTHOP 
     
     if [ $? != 0 ] ; then 
-        test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - ERROR: Cannot add a route for IP $ip" >> $LOGFILE
+        test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - ERROR: Cannot add a route for IP $ip" >> $LOGFILE
         echo "Cannot add a route for $ip!" >&2
     fi
   done < tmp/routes.added
@@ -52,11 +52,11 @@ if [ -s tmp/routes.removed ]; then
   dprintf "Routes to remove:\n"
   while read ip; do
     dprintf "$ip\n"
-    test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - Removed route for IP $ip" >> $LOGFILE
+    test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Removed route for IP $ip" >> $LOGFILE
     [ "$DRY_RUN" ] && continue
     ip route del "$ip" via $BLACKHOLE_NEXTHOP
     if [ $? != 0 ] ; then 
-      test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%m:%S') - ERROR: Cannot remove a route for IP $ip" >> $LOGFILE
+      test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - ERROR: Cannot remove a route for IP $ip" >> $LOGFILE
       echo "Cannot remote the route for $ip!" >&2
     fi
   done < tmp/routes.removed
