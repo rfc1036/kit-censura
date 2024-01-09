@@ -8,16 +8,15 @@ First you need a fully installed instance of the Piracy Shield Client. This soft
 In this example we assume that the docker instance is running and the client can be invoked by CLI.
 
 
-** Configuration File **
+The Piracy Shield Client by AIIP is invoked by kit-censura, so there is no need to include it on crontab directly. Just use the censorship-cron-pscaiip script instead.
 
+
+** Configuration File **
 
 In config.sh you need to add "pscaiip" list in the LISTS variable and add the paths for the lists:
 
 # Local file for Piracy Shield Client by AAIP
 PATH_pscaiip='/opt/piracy-shield-agent-main/'
-
-# Run command for Piracy Shield Client
-CMD_pscaiip
 
 # List name
 FILE_pscaiip='lista.pscaiip' 
@@ -26,6 +25,11 @@ FILE_pscaiip='lista.pscaiip'
 PATH_pscaiip_fqdn='/opt/piracy-shield-agent-main/src/storage/app/fqdn/last.txt'
 PATH_pscaiip_ipv4='/opt/piracy-shield-agent-main/src/storage/app/ipv4/last.txt'
 PATH_pscaiip_ipv6='/opt/piracy-shield-agent-main/src/storage/app/ipv6/last.txt'
+
+
+** Additional requirements **
+
+Please check and edit the "censorship-cron-pscaiip" file according your installation if needed
 
 
 ** Cron requirements **

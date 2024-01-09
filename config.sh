@@ -10,7 +10,7 @@
 # tabacchi - For ADM Lists (Tobacco and Gambling)
 # agcom - For AGCOM Lists (Copyright infringment)
 # cncpo - For CNCPO Lists (anti-pedophilia)
-# consob - For CONSOB Lists (Trading)
+# consob - For CONSOB Lists (Trading) - Not mandatory
 # pscaiip - For Privacy Shield FQDN or IPv4 created by exteral tool provided by AIIP (Associazione Italiana Internet Provider)
 LISTS="manuale aams tabacchi agcom cncpo pscaiip"
 
@@ -35,8 +35,13 @@ FILE_consob='lista.consob'
 # Local file for Manuale
 FILE_manuale='lista.manuale'
 
-# Local file for Piracy Shield Client by AIIP
+# Local file for Piracy Shield Client by AAIP
+PATH_pscaiip='/opt/piracy-shield-agent-main/'
+
+# List name
 FILE_pscaiip='lista.pscaiip'
+
+# File Paths
 PATH_pscaiip_fqdn='/opt/piracy-shield-agent-main/src/storage/app/fqdn/last.txt'
 PATH_pscaiip_ipv4='/opt/piracy-shield-agent-main/src/storage/app/ipv4/last.txt'
 PATH_pscaiip_ipv6='/opt/piracy-shield-agent-main/src/storage/app/ipv6/last.txt'
