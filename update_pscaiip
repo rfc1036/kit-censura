@@ -6,8 +6,20 @@ cd $PATH_pscaiip
 
 test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Invoking AAIP Privacy Shield Client" >> $LOGFILE
 docker-compose exec app bash -c "php application schedule:run" >> $LOGFILE
-test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - AAIP Privacy Shield Client Ended" >> $LOGFILE
+DOCKER_RETURN=$?
 
+
+if [ $DOCKER_RETURN != 0 ] ; then
+   SUBJECT="Error while running Privacy Shield Client"
+   TXT="Privacy Shield Client on $(hostname --fqdn) have failed and returned $DOCKER_RETURN"
+   if [ $ALERT_ENABLE == true ] && [ "x$NOC_EMAIL" != 'x' ] ; then
+	echo -e "Subject: $SUBJECT\nFrom:$FROM_EMAIL\n$TXT" | sendmail $NOC_EMAIL
+   fi
+   test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - AAIP Privacy Shield Client returned Error: $TXT" >> $LOGFILE
+   echo "Warning: $TXT" >&2
+else
+    test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - AAIP Privacy Shield Client Ended" >> $LOGFILE
+fi
 cd /root/kit-censura
 
 #copying files from AAIP Privacy Shield Client
