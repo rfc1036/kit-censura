@@ -26,6 +26,7 @@ cd /root/kit-censura
 test -e "$PATH_pscaiip_fqdn"   && cp $PATH_pscaiip_fqdn $FILE_pscaiip
 if [ -e "$PATH_pscaiip_ipv4" ] ; then 
 	cat $PATH_pscaiip_ipv4 > $FILE_pscaiip-ip
+	echo "" >> $FILE_pscaiip-ip
 	test -e "$PATH_pscaiip_ipv6"  && cat $PATH_pscaiip_ipv6 >> $FILE_pscaiip-ip
 else
 	test -e "$PATH_pscaiip_ipv6" && cat $PATH_pscaiip_ipv6 > $FILE_pscaiip-ip
@@ -33,7 +34,7 @@ fi
 
 
 if [ -e "$FILE_pscaiip" ]; then
-  egrep '^[^#]' $FILE_pscaiip | sed 's~http[s]*://~~g' | sort | uniq > lists/pscaiip.new.tmp
+  egrep '^[^#]' $FILE_pscaiip | sed 's~http[s]*://~~g' | sed -e "s/\r//g"  | sort | uniq > lists/pscaiip.new.tmp
   #cp $FILE_pscaiip lists/pscaiip.new.tmp
   #egrep '^[^#]' $FILE_pscaiip  |  sort  |  uniq  >  lists/pscaiip.new.tmp
   mv lists/pscaiip.new.tmp lists/pscaiip.new
