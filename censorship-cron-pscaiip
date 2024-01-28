@@ -5,6 +5,9 @@
 cd /root/kit-censura
 source config.sh
 
+#check if service is enabled
+echo $LISTS | grep pscaiip ||  exit 255
+
 list=pscaiip
 
 test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - updating list $list" >> $LOGFILE
