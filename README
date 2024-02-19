@@ -30,7 +30,6 @@ python version >= 3.0
 ** External files needed **
 
 Download helpers download_agcom.py and download_consob.py from https://github.com/mphilosopher/censura
-Download network aggregation script supernets.py from  https://github.com/grelleum/supernets 
 
 ** Author **
 
@@ -39,6 +38,8 @@ Originally Written by Marco d'Itri <md@Linux.IT>.
 
 Alerting and Logging by Antonio Bartolini <antonio.bartolini@connesi.it>
 Privacy Shield Client by AAIP integration by Antonio Bartolini <antonio.bartolini@connesi.it>
+
+supernets.py script from  https://github.com/grelleum/supernets
 
 The authors will appreciate receiving success or failure reports about
 the deployment this software.

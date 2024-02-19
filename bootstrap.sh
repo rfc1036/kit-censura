@@ -8,10 +8,6 @@ chmod +x download_agcom.py
 wget "https://github.com/mphilosopher/censura/raw/master/src/download_consob.py" -O download_consob.py
 chmod +x download_consob.py
 
-wget "https://github.com/grelleum/supernets/raw/master/supernets.py" -O supernets.py
-chmod +x supernets.py
-
-
 echo Creating new empty files:
 
 touch lista.manuale
