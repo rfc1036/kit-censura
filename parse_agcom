@@ -101,8 +101,8 @@ sub parse_agcom_file {
 
 	close $fh;
 
-	die "$file has no header!\n"
-		if not ($number and $date_y and $date_m and $date_d);
+#	die "$file has no header!\n"
+#		if not ($number and $date_y and $date_m and $date_d);
 
 	die "$file contains no data!\n" if not (@domains or @ips or @urls);
 
