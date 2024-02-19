@@ -21,6 +21,14 @@ fi
 test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Install Routes Linux Started" >> $LOGFILE
 
 NUMBER=0
+for i in $(ip route | grep lo | cut -f1 -d\ ) ; do
+        NUMBER=$(expr $NUMBER + 1)
+        ip route del $i dev lo
+
+done
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Cleared $NUMBER RBH routes" >> $LOGFILE
+
+NUMBER=0
 while read -r line ; do
 	NUMBER=$(expr $NUMBER + 1)
 	# works with both ip or cidr
