@@ -25,6 +25,7 @@ parse_cncpo: Text::CSV >= 0.32
 update_*: wget
 upload-bind-config: rsync (local and remote), BIND (remote)
 upload-unbound-config: rsync (local and remote), Unbound (remote)
+python version >= 3.0
 
 ** External files needed **
 
