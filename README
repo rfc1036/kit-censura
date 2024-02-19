@@ -57,14 +57,9 @@ Many scripts contain configuration variables that are stored in config.sh.
 Read and understand each one before before running them.
 Start from censorship-get and then censorship-apply.
 
-Before starting make sure to create the following directories in the 
-working path:
+Before starting make sure to run the bootstrap script in working path:
 
-mkdir tmp lists
-
-and create the generic lists (if needed):
-
-touch lista.manuale lista.manuale-ip
+bash bootstrap.sh
 
 The install-routes-linux script can be run directly on a border router
 or on a system where a dynamic routing protocol will redistribute the
