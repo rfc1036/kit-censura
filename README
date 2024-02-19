@@ -74,6 +74,7 @@ censorship-cron is the script to be called via cron:
 # run every 6 hours
 27  */6  * * *     root   /root/kit-censura/censorship-cron  &> /dev/null
 
+If you are using the Piracy Shield Client by AIIP see README.pscaiip
 
 ** Logging and Alerting **
 
