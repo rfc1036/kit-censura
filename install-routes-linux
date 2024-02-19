@@ -6,63 +6,27 @@
 # Set $DRY_RUN to only get a summary of the changes which would be applied.
 
 source config.sh
+
+BLACKHOLEFILE=$1
+
+if [ "x$BLACKHOLEFILE" == "x" ] ; then 
+	BLACKHOLEFILE=$CONF_IP
+fi
+
+if [ ! -e $BLACKHOLEFILE ] ; then 
+	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - ERROR: File $BLACKHOLEFILE not found" >> $LOGFILE
+       exit
+fi       
+
 test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Install Routes Linux Started" >> $LOGFILE
 
-##############################################################################
-if [ -t 0 ]; then VERBOSE=1; fi
-if [ "$DRY_RUN" ]; then VERBOSE=1; fi
+NUMBER=0
+while read -r line ; do
+	NUMBER=$(expr $NUMBER + 1)
+	# works with both ip or cidr
+	ip route add $line via $BLACKHOLE_NEXTHOP
+done < $BLACKHOLEFILE
 
-dprintf() {
-  [ "$VERBOSE" ] || return 0
-  printf "$*"
-}
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Added $NUMBER RBH routes" >> $LOGFILE
 
-##############################################################################
-list_routes() {
-  local ip="$1"
-  ip -o route list | awk "/ via $ip / {print \$1}"
-}
-
-##############################################################################
-list_routes $BLACKHOLE_NEXTHOP | sort > tmp/routes.installed
-
-for list in $LISTS; do
-  test -e lists/${list}-ip && grep '^[^#]' lists/${list}-ip
-done | sort | uniq > tmp/routes.new
-
-comm -13 tmp/routes.installed tmp/routes.new > tmp/routes.added
-comm -23 tmp/routes.installed tmp/routes.new > tmp/routes.removed
-
-if [ -s tmp/routes.added ]; then
-  dprintf "Routes to add:\n"
-  while read ip; do
-    dprintf "$ip\n"
-    test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Added route for IP $ip" >> $LOGFILE
-    [ "$DRY_RUN" ] && continue
-    ip route add "$ip" via $BLACKHOLE_NEXTHOP 
-    
-    if [ $? != 0 ] ; then 
-        test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - ERROR: Cannot add a route for IP $ip" >> $LOGFILE
-        echo "Cannot add a route for $ip!" >&2
-    fi
-  done < tmp/routes.added
-fi
-
-if [ -s tmp/routes.removed ]; then
-  dprintf "Routes to remove:\n"
-  while read ip; do
-    dprintf "$ip\n"
-    test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Removed route for IP $ip" >> $LOGFILE
-    [ "$DRY_RUN" ] && continue
-    ip route del "$ip" via $BLACKHOLE_NEXTHOP
-    if [ $? != 0 ] ; then 
-      test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - ERROR: Cannot remove a route for IP $ip" >> $LOGFILE
-      echo "Cannot remote the route for $ip!" >&2
-    fi
-  done < tmp/routes.removed
-fi
-
-rm -f tmp/routes.*
-
-exit 0
-
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Install Routes Linux Ended" >> $LOGFILE
