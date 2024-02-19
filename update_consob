@@ -2,6 +2,33 @@
 
 source config.sh
 
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Downloading Consob List" >> $LOGFILE
+
+# TODO make your own script
+if [ -x $CONSOB_DOWNLOAD_HELPER ] ; then 
+	python $CONSOB_DOWNLOAD_HELPER -o lists/consob.new.tmp
+else 
+	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - CONSOB Error: Helper $CONSOB_DOWNLOAD_HELPER not found" >> $LOGFILE
+	exit
+fi
+CURL_RETURN=$?
+
+if [ $CURL_RETURN != 0 ] ; then
+        SUBJECT="Error while fetching CONSOB lists"
+        TXT="download_consob.py on $(hostname --fqdn) have returned $CURL_RETURN when trying to parse the CMS"
+        if [ $ALERT_ENABLE == true ] && [ "x$NOC_EMAIL" != 'x' ] ; then
+	        echo -e "Subject: $SUBJECT\nFrom:$FROM_EMAIL\n$TXT" | sendmail $NOC_EMAIL
+	fi
+	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - CONSOB Error: $TXT" >> $LOGFILE
+	echo "Warning: $TXT" >&2
+	exit 255
+
+fi
+
+
+cat lists/consob.new.tmp | tr '[:upper:]' '[:lower:]' | sort | uniq > $FILE_consob
+rm lists/consob.new.tmp
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - CONSOB List Downloaded" >> $LOGFILE
 
 if [ -e "$FILE_consob" ]; then
   egrep '^[^#]' $FILE_consob | sed 's~http[s]*://~~g' | sort | uniq > lists/consob.new.tmp

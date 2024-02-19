@@ -26,15 +26,19 @@ update_*: wget
 upload-bind-config: rsync (local and remote), BIND (remote)
 upload-unbound-config: rsync (local and remote), Unbound (remote)
 
+** External files needed **
+
+Download helpers download_agcom.py and download_consob.py from https://github.com/mphilosopher/censura
+Download network aggregation script supernets.py from  https://github.com/grelleum/supernets 
+
 ** Author **
 
-Copyright 2008-2024 by Seeweb s.r.l.
+Copyright 2008-2018 by Seeweb s.r.l.
 Originally Written by Marco d'Itri <md@Linux.IT>.
 
 Alerting and Logging by Antonio Bartolini <antonio.bartolini@connesi.it>
-Privacy Shield Client by AAIP integration by Antonio Bartolini <antonio.bartolini@connesi.it>
 
-The authors will appreciate receiving success or failure reports about
+The author will appreciate receiving success or failure reports about
 the deployment this software.
 
 
@@ -52,31 +56,10 @@ Many scripts contain configuration variables that are stored in config.sh.
 Read and understand each one before before running them.
 Start from censorship-get and then censorship-apply.
 
-Before starting make sure to create the following directories in the 
-working path:
-
-mkdir tmp lists 
-
-and create the generic lists (if needed):
-
-touch lista.manuale lista.manuale-ip
-
 The install-routes-linux script can be run directly on a border router
 or on a system where a dynamic routing protocol will redistribute the
 static routes it installs.
 
-** Logging and Alerting **
-
-You can enable Logging and Alerting by changing config.sh file.
-By default the log file is placed on /var/log/kit-censura.log
-
-If log rotation is needed there is a template for logrotate in 
-kit-censura.logrotate file ready to be edited and moved on 
-logrotate.d directory.
-
-Alerting is triggered only when downloads fails for some reasons and
-send an email of warning at the address specified in config.sh file.
-Just be sure that sendmail tool is working propely.
 
 ** Name servers configuration **
 

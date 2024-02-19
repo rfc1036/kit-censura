@@ -47,7 +47,7 @@ PATH_pscaiip_ipv4='/opt/piracy-shield-agent-main/src/storage/app/ipv4/last.txt'
 PATH_pscaiip_ipv6='/opt/piracy-shield-agent-main/src/storage/app/ipv6/last.txt'
 
 # curl options
-CERTS_cncpo='--cert cncpo.pem --key cncpo.key --cacert cncpo-ca.pem'
+CERTS_cncpo='-k --cert cncpo.pem --key cncpo.key --cacert cncpo-ca.pem'
 
 # curl options for cncpo
 CURL_OPTS_cncpo="$CERTS_cncpo"
@@ -67,8 +67,25 @@ RSYNC_OPTIONS='--timeout=30 -rt'
 # the local file
 CONF='lists/named.conf'
 
+# local full ip list
+CONF_IP='lists/ip-fullist'
+
 # the directory on the name servers containing the zone files
 CONFDIR='/etc/bind/censura'
+
+############ External Tools
+
+# Download Helper for agcom
+# download from https://github.com/mphilosopher/censura/blob/master/src/download_agcom.py
+AGCOM_DOWNLOAD_HELPER='download_agcom.py'
+
+# Download Helper for consob
+# download from https://github.com/mphilosopher/censura/blob/master/src/download_consob.py
+CONSOB_DOWNLOAD_HELPER='download_consob.py'
+
+# Tool for cidr summarization
+# download it from https://github.com/grelleum/supernets
+AGGREGATION_TOOL='supernets.py'
 
 ############ Blackholing
 
@@ -78,6 +95,11 @@ ROUTES_LISTS='cncpo'
 # Blackhole Nexthop
 BLACKHOLE_NEXTHOP='192.168.254.254'
 
+# Aggregate route?
+AGGREGATE_PREFIX=true
+
+# Aggregated prefix list path
+AGGREGATE_LIST_FILE='lists/cidr-fullist'
 
 ############ Logging
 
