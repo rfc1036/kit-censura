@@ -67,6 +67,14 @@ The install-routes-linux script can be run directly on a border router
 or on a system where a dynamic routing protocol will redistribute the
 static routes it installs.
 
+** Cron requirements **
+
+censorship-cron is the script to be called via cron:
+
+# run every 6 hours
+27  */6  * * *     root   /root/kit-censura/censorship-cron  &> /dev/null
+
+
 ** Logging and Alerting **
 
 You can enable Logging and Alerting by changing config.sh file.
