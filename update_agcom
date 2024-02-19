@@ -3,11 +3,11 @@
 source config.sh
 
 test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Downloading AGCOM List" >> $LOGFILE
-if [ -x $AGCOM_DOWNLOAD_HELPER ] ; then
+if [ -e $AGCOM_DOWNLOAD_HELPER ] ; then
 	# TODO make your own script
 	python $AGCOM_DOWNLOAD_HELPER -o lists/agcom.new.tmp
 else
-        test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - AGCOM Error: Helper $AGCOM_DOWNLOAD_HELPER not found" >> $LOGFILE
+        test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - AGCOM Error: Helper $AGCOM_DOWNLOAD_HELPER not found. See README" >> $LOGFILE
         exit
 fi
 

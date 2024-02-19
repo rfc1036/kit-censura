@@ -26,6 +26,11 @@ rm $TEMPFILE
 if [ $AGGREGATE_PREFIX == 'true' ] ; then
        test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - IP Aggregation enabled." >> $LOGFILE	
 	# Subnets aggregation
+	
+	if [ ! -e $AGGREGATION_TOOL ] ; then
+		test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - ERROR: $AGGREGATION_TOOL not found. See README" >> $LOGFILE
+		exit
+	fi
 	python $AGGREGATION_TOOL $CONF_IP-new | sort | uniq > $AGGREGATE_LIST_FILE-new
 	if [ ! -e $AGGREGATE_LIST_FILE ] || ! diff $AGGREGATE_LIST_FILE $AGGREGATE_LIST_FILE-new &> /dev/null; then
 		test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - New IPs detected." >> $LOGFILE
