@@ -8,6 +8,44 @@ source config.sh
 test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Censorship APPLY started." >> $LOGFILE  
 ./upload-bind-config || true
 #./upload-unbound-config || true
-./install-routes-linux || true
 
+#copying all the lists
+TEMPFILE=$CONF_IP-tmp
+echo -n "" > $TEMPFILE
+for i in $LISTS ; do
+	if [ -e lists/$i-ip ] ; then
+		test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - $i IPs: $(wc -w lists/$i-ip)" >> $LOGFILE
+        	cat lists/$i-ip | sed 's/\r//g' >> $TEMPFILE
+	fi
+done
+
+
+cat $TEMPFILE | sort | uniq > $CONF_IP-new
+rm $TEMPFILE
+
+if [ $AGGREGATE_PREFIX == 'true' ] ; then
+       test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - IP Aggregation enabled." >> $LOGFILE	
+	# Subnets aggregation
+	python $AGGREGATION_TOOL $CONF_IP-new | sort | uniq > $AGGREGATE_LIST_FILE-new
+	if [ ! -e $AGGREGATE_LIST_FILE ] || ! diff $AGGREGATE_LIST_FILE $AGGREGATE_LIST_FILE-new &> /dev/null; then
+		test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - New IPs detected." >> $LOGFILE
+		mv $AGGREGATE_LIST_FILE-new $AGGREGATE_LIST_FILE
+		./install-routes-linux $AGGREGATE_LIST_FILE || true
+	else
+		test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - No new IPs detected." >> $LOGFILE
+	fi
+else
+ # no aggregation
+	if [ ! -e $CONF_IP ] || ! diff $CONF_IP $CONF_IP-new &> /dev/null; then
+       		test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - New IPs detected." >> $LOGFILE	
+		mv $CONF_IP-new $CONF_IP
+		./install-routes-linux $CONF_IP || true
+	else
+		test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - No new IPs detected." >> $LOGFILE
+	fi
+fi
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Total IPs: $(wc -w $CONF_IP)" >> $LOGFILE
+if [ $AGGREGATE_PREFIX == 'true' ] ; then
+	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Total CIDRs: $(wc -w $AGGREGATE_LIST_FILE)" >> $LOGFILE
+fi
 test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Censorship APPLY ended." >> $LOGFILE

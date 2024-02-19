@@ -2,6 +2,34 @@
 
 source config.sh
 
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Downloading AGCOM List" >> $LOGFILE
+if [ -x $AGCOM_DOWNLOAD_HELPER ] ; then
+	# TODO make your own script
+	python $AGCOM_DOWNLOAD_HELPER -o lists/agcom.new.tmp
+else
+        test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - AGCOM Error: Helper $AGCOM_DOWNLOAD_HELPER not found" >> $LOGFILE
+        exit
+fi
+
+CURL_RETURN=$?
+
+if [ $CURL_RETURN != 0 ] ; then
+        SUBJECT="Error while fetching AGCOM lists"
+        TXT="download_agcom.py on $(hostname --fqdn) have returned $CURL_RETURN when trying to parse the CMS"
+        if [ $ALERT_ENABLE == true ] && [ "x$NOC_EMAIL" != 'x' ] ; then
+               echo -e "Subject: $SUBJECT\nFrom:$FROM_EMAIL\n$TXT" | sendmail $NOC_EMAIL
+	fi
+     	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - AGCOM Error: $TXT" >> $LOGFILE
+     	echo "Warning: $TXT" >&2
+	exit 255
+fi
+
+cat lists/agcom.new.tmp | tr '[:upper:]' '[:lower:]' | sort | uniq > $FILE_agcom
+rm lists/agcom.new.tmp
+
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - AGCOM List Downloaded" >> $LOGFILE
+
+
 if [ ! -e "$FILE_agcom" ]; then
   test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - WARNING: $FILE_agcom does not exist!" >> $LOGFILE
   echo "WARNING: $FILE_agcom does not exist!" >&2
@@ -13,3 +41,4 @@ fi
 test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - AGCOM Parsing Started" >> $LOGFILE
 #./parse_agcom "$FILE_agcom" lists/agcom.new lists/agcom-ip.new
 ./parse_aams "$FILE_agcom" lists/agcom.new
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - AGCOM Parsing Ended" >> $LOGFILE
