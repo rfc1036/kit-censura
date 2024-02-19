@@ -84,7 +84,6 @@ AGCOM_DOWNLOAD_HELPER='download_agcom.py'
 CONSOB_DOWNLOAD_HELPER='download_consob.py'
 
 # Tool for cidr summarization
-# download it from https://github.com/grelleum/supernets
 AGGREGATION_TOOL='supernets.py'
 
 # Maximum CIDR length (default 25)
