@@ -87,6 +87,9 @@ CONSOB_DOWNLOAD_HELPER='download_consob.py'
 # download it from https://github.com/grelleum/supernets
 AGGREGATION_TOOL='supernets.py'
 
+# Maximum CIDR length (default 25)
+AGGREGATION_MAXLEN=25
+
 ############ Blackholing
 
 # Lists to be applied for blackholing
