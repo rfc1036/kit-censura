@@ -145,7 +145,6 @@ def main(argv=None):
             maxrange = int(argv[ argv.index(arg) + 1 ])
             argv.remove(argv[ argv.index(arg) + 1 ])
             argv.remove(arg)
-            print( maxrange, " is maxrange")
         
     process_input(argv)
     process_prefixes()
