@@ -5,6 +5,13 @@ source config.sh
 cd $PATH_pscaiip
 
 test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Invoking AAIP Privacy Shield Client" >> $LOGFILE
+
+if [ $PSCAIIP_RANDOM_SLEEP == 'true' ] ; then
+        SLEEP=$((RANDOM % $PSCAIIP_MAXWAIT))
+        test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Random wait enabled: waiting for $SLEEP seconds" >> $LOGFILE
+        sleep $((RANDOM % $SLEEP));
+fi
+
 docker-compose exec app bash -c "php application schedule:run" >> $LOGFILE
 DOCKER_RETURN=$?
 

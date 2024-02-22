@@ -46,6 +46,13 @@ PATH_pscaiip_fqdn='/opt/piracy-shield-agent-main/src/storage/app/fqdn/last.txt'
 PATH_pscaiip_ipv4='/opt/piracy-shield-agent-main/src/storage/app/ipv4/last.txt'
 PATH_pscaiip_ipv6='/opt/piracy-shield-agent-main/src/storage/app/ipv6/last.txt'
 
+# Since the Piracy Shield's server are often overloaded
+# there is a random sleep option
+PSCAIIP_RANDOM_SLEEP=true
+
+# Maximum sleep time in seconds (default 30)
+PSCAIIP_MAXWAIT=30
+
 # curl options
 CERTS_cncpo='-k --cert cncpo.pem --key cncpo.key --cacert cncpo-ca.pem'
 
