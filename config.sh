@@ -14,6 +14,12 @@
 # pscaiip - For Privacy Shield FQDN or IPv4 created by exteral tool provided by AIIP (Associazione Italiana Internet Provider)
 LISTS="manuale aams tabacchi agcom cncpo pscaiip"
 
+# Lists to be downloaded/updated
+# You might use all lists here. To be used to keep old
+# lists active but you don't want to download or update
+# new records
+UPDATE_LISTS=$LISTS
+
 # CNCPO URL
 URL_cncpo='https://212.14.145.50/'
 

@@ -13,7 +13,7 @@ if [ "$1" ]; then
 fi
 
 # update each list
-for list in $LISTS; do
+for list in $UPDATE_LISTS; do
 
   test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - updating list $list" >> $LOGFILE 
 
