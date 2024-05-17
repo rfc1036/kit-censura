@@ -16,6 +16,6 @@ touch lista.manuale-ip
 
 
 echo Creating dirs
-mkdir tmp lists
+mkdir tmp lists gpg
 
 
