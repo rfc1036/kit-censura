@@ -1,53 +1,63 @@
-This is the procedure to obtain a copy of the SSL certificate needed to
-download the blacklist from the CNCPO web site.
-It keeps the need for access to a Windows system at the absolute minimum
-required and then only for steps which are not security sensitive.
+A partire dal 21/05/2024, il Centro Nazionale Per Il Contrasto della Pedopornografia Online
+ha cambiato modalita' di trasmissione delle liste, utilizzando la PEC.
 
+Il C.N.C.P.O. richiede inoltre che venga fornita una chiave GPG pubblica con la quale verranno
+criptate le liste e la conferma di avvenuta ricezione sempre tramite PEC
 
-Generate a CSR using:
+Per poter elaborare le richieste, quindi, e' necessario prima di tutto geneare le chiavi GPG
+da inviare al C.N.C.P.O.
 
-openssl req -nodes -newkey rsa:1024 -keyout newmyprivate.key -out newclient.csr
+Per generare la chiave e' sufficiente installare il pacchetto gpg e digitare i comandi:
+```
+# gpg --full-generate-key
 
-Some X.500 fields have been overloaded to contain unrelated information,
-so it is mandatory to answer this way the "standard" openssl questions:
+	gpg (GnuPG) 2.2.19; Copyright (C) 2019 Free Software Foundation, Inc.
+	This is free software: you are free to change and redistribute it.
+	There is NO WARRANTY, to the extent permitted by law.
+	
+	Selezionare il tipo di chiave:
+	   (1) RSA e RSA (impostazione predefinita)
+	   (2) DSA ed Elgamal
+	   (3) DSA (solo firma)
+	   (4) RSA (solo firma)
+	  (14) Chiave esistente dalla scheda
+	Selezione? **1**
+	
+	Le chiavi RSA possono essere lunghe tra 1024 e 4096 bit.
+	Che chiave vuoi? (3072) **4096**
+	
+	La dimensione chiave richiesta è 4096 bit
+	Specificare la durata di validità della chiave.
+			 0 = la chiave non scade
+		  <N>  = la chiave scade dopo N giorni
+		  <N>w = la chiave scade dopo N settimane
+		  <N>m = la chiave scade dopo N mesi
+		  <N>y = la chiave scade dopo N anni
+	Per quanto tempo deve essere valida la chiave? (0) **0**
+	La chiave non scade affatto
+	È corretto? (y/N) **y**
+	
+	GnuPG deve costruire un ID utente per identificare la chiave.
+	
+	Nome reale: Mario Rossi
+	Indirizzo email: filtraggi@pec.acme.it
+	Commento: CNCPO
+	È stato selezionato questo USER-ID:
+		"Mario Rossi (CNCPO) <filtraggi@pec.acme.it>"
+	
+	Modificare (n)ome, (c)ommento, (e)mail oppure (o)k/(u)scire? **o**
 
-Country Name (2 letter code) [AU]:IT
-State or Province Name (full name) [Some-State]:10.0.0.1 10.0.0.2
-Locality Name (eg, city) []:Via Caldera 21, Milano
-Organization Name (eg, company) [Internet Widgits Pty Ltd]:Seeweb s.r.l.
-Organizational Unit Name (eg, section) []:+39-0775-880041 +39-0775-830054
-Common Name (eg, YOUR name) []:Marco d'Itri
-Email Address []:md@seeweb.it
+```
 
+Una volta completato le chiavi pubbliche e private vanno esportate nella cartella gpg del kit-censura:
 
-Then you can visit https://195.120.182.202:8092/certsrv/certrqxt.asp to
-submit the CSR.
-You must login with the credentials documented in the
-Certificazione\ Client\ SSL\ v.2.0.pdf file which has been distributed by
-the CNCPO.
-It used to be mandatory to use a recent enough version of MSIE running on
-the right version of Windows, but as of 2010-03-15 Firefox on Linux works
-too.
-After the CSR will have been approved you can connect to
-https://195.120.182.202:8092/certsrv/certckpn.asp to download it and
-then convert it to PEM format:
+Per la chiave pubblica:
+```
+# gpg --export --armor -a "cncpo@ehinet.it" > gpg/chiave_pubblica.asc
+```
 
-openssl x509 -in /tmp/certnew.cer -inform DER -out cncpo.pem -outform PEM
-
-
-After downloading the root certificate from the main page of the web
-site you will need to convert it to PEM format:
-
-unzip CertificatoCA.zip
-openssl x509 -in CertificatoCA.cer -inform DER -out cncpo-ca.pem -outform PEM
-
-
-If you already have a certificate in PFX format instead, you can convert
-it to base64 and PEM using this commands and then separate the public, ca and private keys:
-
-openssl enc -base64 -d -in cncpo.pfx -out cncpo-base64.pfx
-openssl pkcs12 -in cncpo-base64.pfx -out cncpo.key -nodes -nocerts
-openssl pkcs12 -in cncpo-base64.pfx -out cncpo.pem -nodes -clcerts
-openssl pkcs12 -in cncpo-base64.pfx -out cncpo-ca.pem -nodes -cacerts
-
+Per la chiave privata:
+```
+# gpg --output gpg/chiave_privata.pgp --armor --export-secret-key filtraggi@pec.acme.it
+```
 
