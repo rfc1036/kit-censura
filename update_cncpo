@@ -32,8 +32,9 @@ if [ $? != 0 ] ; then
 else
 	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Successfully checked CNCPO lists" >> $LOGFILE
 fi	
+###############################
 
-
+#################################
 if [ -e $CNCPO_DOWNLOAD_DIR/$CNCPO_FILE_NAME_CRYPT ] ; then 
 	
 	# import key
@@ -71,9 +72,28 @@ if [ -e $CNCPO_DOWNLOAD_DIR/$CNCPO_FILE_NAME_CRYPT ] ; then
 	mv $CNCPO_DOWNLOAD_DIR/$CNCPO_FILE_NAME_DECRYPT $FILE_cncpo
 	
 	
-	# TODO: parse for answer
+	# Parse header for answer
+	LISTAID=$(head -1 $FILE_cncpo)
 	
-	# TODO: answer
+	
+	# answer
+	if [ $CNCPO_REPLY_ENABLED == true ] ; then 
+		# TODO: INSERT LISTAID
+		echo "$CNCPO_REPLY_TEMPLATE" | sed "s/_LISTAID_/$LISTAID/g" | sed "s/_DATE_/$(date)/g" | python $CNCPO_EMAIL_SENDER
+		
+		if [ $? != 0 ] ; then
+			SUBJECT="Error while sending reply message to CNCPO"
+			TXT="Unable to send reply message to $CNCPO_REPLY_DESTINATION"
+			if [ $ALERT_ENABLE == true ] && [ "x$NOC_EMAIL" != 'x' ] ; then
+						echo -e "Subject: $SUBJECT\nFrom:$FROM_EMAIL\n$TXT" | sendmail $NOC_EMAIL
+			fi
+			test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - CNCPO Error: $TXT" >> $LOGFILE
+			echo "Warning: $TXT" >&2
+			exit 255
+		else
+			test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Successfully Sent CNCPO PEC Reply" >> $LOGFILE
+		fi
+	fi
 	
 else
 	# nothing new to do

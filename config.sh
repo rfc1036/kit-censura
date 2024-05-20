@@ -21,9 +21,19 @@ LISTS="manuale aams tabacchi agcom cncpo pscaiip"
 UPDATE_LISTS=$LISTS
 
 
+########### Alerting 
+
+# Set true to enable alerting 
+ALERT_ENABLE=true
+# insert NOC email to enable alerting
+NOC_EMAIL=''
+#NOC_EMAIL=''
+# sender address
+FROM_EMAIL='cncpo@connesi.it'
+
 ##################### CNCPO ########################
 # CNCPO PEC IMAP SERVER
-CNCPO_IMAP_SERVER='mail.twtcert.it'
+CNCPO_IMAP_SERVER='mail.pecprovider.it'
 
 # CNCPO PEC USERNAME
 CNCPO_IMAP_USER='changeme@pecprovider.it'
@@ -72,6 +82,40 @@ GPG_KEY_PASSWORD='Shhh Dont tell anyone'
 
 # Local File for CNCPO
 FILE_cncpo='tmp/blacklist.csv'
+
+# SEND Automatic Reply?
+CNCPO_REPLY_ENABLED=true
+
+# Subject 
+CNCPO_REPLY_SUBJECT="Messaggio di avvenuta ricezione lista filtraggi CNCPO"
+
+# Sender 
+CNCPO_REPLY_SENDER=$CNCPO_IMAP_USER
+
+# Destination 
+CNCPO_REPLY_DESTINATION=$CNCPO_MAIL_FROM
+
+# Put NOC In Copy
+CNCPO_REPLY_CC=$NOC_EMAIL
+
+# SNMP Server
+CNCPO_SMTP_SERVER=$CNCPO_IMAP_SERVER
+
+# SNMP Authentication User
+CNCPO_REPLY_USERNAME=$CNCPO_IMAP_USER
+
+# SNMP Authentication PASSWORD
+CNCPO_REPLY_PASSWORD=$CNCPO_IMAP_PSWD
+
+# Message Template.
+# Underscore variables (_LISTAID_ and _DATE_) will be replaced automatically
+CNCPO_REPLY_TEMPLATE="Buongiorno,
+con la presente si segnala avvenuta ricezione e applicazione della lista dei siti da inibire per il CNCPO con identificativo _LISTAID_ del _DATE_.
+Il messaggio e stato generato automaticamente. Vi preghiamo di segnalare qualsiasi eventuale problema o incorrettezza della presente segnalazione.
+
+Cordiali Saluti.
+Acme S.p.A.
+"
 
 ##################### AGCOM ########################
 # AGCOM URL
@@ -176,12 +220,3 @@ LOGGING_ENABLE=true
 LOGFILE='/var/log/kit-censura.log'
 
 
-########### Alerting 
-
-# Set true to enable alerting 
-ALERT_ENABLE=true
-# insert NOC email to enable alerting
-NOC_EMAIL=''
-#NOC_EMAIL=''
-# sender address
-FROM_EMAIL='cncpo@connesi.it'
