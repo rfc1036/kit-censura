@@ -3,39 +3,86 @@
 source config.sh
 source curl_errors.sh
 
-##############################################################################
-# be verbose when stdout is a tty
-if [ ! -t 0 ]; then
-  CURL_OPTS_cncpo="$CURL_OPTS_cncpo --silent --show-error"
-fi
 
-# on this server, bind to a specific IP address
-if [ "$(hostname --fqdn)" = "anubi.seeweb.it" ]; then
-  CURL_OPTS_cncpo="$CURL_OPTS_cncpo --interface 212.25.179.125"
-fi
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - CNCPO PEC Checking Started" >> $LOGFILE
 
-## downloading ###############################################################
-curl --fail --location --remote-time $CURL_OPTS_cncpo \
-  --output $FILE_cncpo.tmp $URL_cncpo
+cd $CNCPO_WORKING_DIR
 
-CURL_RETURN=$?
+# generating new setting file
+cp $CNCPO_SETTINGS_TMPL settings.yaml
 
-mv $FILE_cncpo.tmp $FILE_cncpo
+VARS=$(set | grep CNCPO | cut -d= -f1)
+for var in $VARS ; do
+	VALUE=$(echo ${!var} | sed 's/\//\\\//g' )
+	sed -i "s/${var}/$VALUE/g" settings.yaml
+done
 
-if [ $CURL_RETURN != 0 ] ; then
-        SUBJECT="Error while fetching CNCPO lists"
-        TXT="Curl on $(hostname --fqdn) have returned $CURL_RETURN:\n\n${curl_errors[$CURL_RETURN]}\n\n when trying to get $URL_cncpo."
+# Running the Fetcher
+
+python $CNCPO_DOWNLOAD_HELPER &>> $LOGFILE
+if [ $? != 0 ] ; then
+	SUBJECT="Error while fetching CNCPO lists"
+	TXT='Unable to check PEC Mailbox'
 	if [ $ALERT_ENABLE == true ] && [ "x$NOC_EMAIL" != 'x' ] ; then
-        	echo -e "Subject: $SUBJECT\nFrom:$FROM_EMAIL\n$TXT" | sendmail $NOC_EMAIL
+				echo -e "Subject: $SUBJECT\nFrom:$FROM_EMAIL\n$TXT" | sendmail $NOC_EMAIL
 	fi
-        test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - CNCPO Error: $TXT" >> $LOGFILE
-        echo "Warning: $TXT" >&2
-
+	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - CNCPO Error: $TXT" >> $LOGFILE
+	echo "Warning: $TXT" >&2
+	exit 255
 else
-     test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Successfully downloaded CNCPO lists" >> $LOGFILE
+	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Successfully checked CNCPO lists" >> $LOGFILE
+fi	
 
+
+if [ -e $CNCPO_DOWNLOAD_DIR/$CNCPO_FILE_NAME_CRYPT ] ; then 
+	
+	# import key
+	if [ $GPG_IMPORT_KEY == true ] ; then 
+		test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - CNCPO Key Import Started" >> $LOGFILE
+		$CNCPO_GPG_PATH --batch --passphrase $GPG_KEY_PASSWORD --import $GPG_PRIVATE_KEY &>> $LOGFILE
+		if [ $? != 0 ] ; then
+			SUBJECT="Error while importing GPG Keyfile $GPG_PRIVATE_KEY"
+			TXT='Unable to import GPG Keyfile $GPG_PRIVATE_KEY'
+			if [ $ALERT_ENABLE == true ] && [ "x$NOC_EMAIL" != 'x' ] ; then
+						echo -e "Subject: $SUBJECT\nFrom:$FROM_EMAIL\n$TXT" | sendmail $NOC_EMAIL
+			fi
+			test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - CNCPO Error: $TXT" >> $LOGFILE
+			echo "Warning: $TXT" >&2
+			exit 255
+		fi
+	fi
+	
+	# decrypt
+	$CNCPO_GPG_PATH --batch --passphrase $GPG_KEY_PASSWORD --decrypt $CNCPO_DOWNLOAD_DIR/$CNCPO_FILE_NAME_CRYPT -o $CNCPO_DOWNLOAD_DIR/$CNCPO_FILE_NAME_DECRYPT
+	if [ $? != 0 ] ; then
+		SUBJECT="Error while decrypting list"
+		TXT='Unable to decrypt file $CNCPO_FILE_NAME_CRYPT with GPG Keyfile $GPG_PRIVATE_KEY'
+		if [ $ALERT_ENABLE == true ] && [ "x$NOC_EMAIL" != 'x' ] ; then
+					echo -e "Subject: $SUBJECT\nFrom:$FROM_EMAIL\n$TXT" | sendmail $NOC_EMAIL
+		fi
+		test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - CNCPO Error: $TXT" >> $LOGFILE
+		echo "Warning: $TXT" >&2
+		exit 255
+	else
+		test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Successfully decrypted CNCPO lists" >> $LOGFILE
+	fi
+	
+	# copy files 
+	mv $CNCPO_DOWNLOAD_DIR/$CNCPO_FILE_NAME_DECRYPT $FILE_cncpo
+	
+	
+	# TODO: parse for answer
+	
+	# TODO: answer
+	
+else
+	# nothing new to do
+	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - No new lists found." >> $LOGFILE
+	
 fi
 
+
+cd ..
 ## parsing ###################################################################
 test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - CNCPO Parsing Started" >> $LOGFILE
 ./parse_cncpo $FILE_cncpo lists/cncpo.new lists/cncpo-ip.new 2>&1 | tee -a $LOGFILE
@@ -44,4 +91,14 @@ if [ $? == 0 ] ; then
 else
 	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Error while Parsing CNCPO Lists" >> $LOGFILE
 fi
+
+
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Successfully downloaded CNCPO lists" >> $LOGFILE
+
+
+
+
+
+
+
 

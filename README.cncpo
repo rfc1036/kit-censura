@@ -45,7 +45,7 @@ Per generare la chiave e' sufficiente installare il pacchetto gpg e digitare i c
 	Indirizzo email: filtraggi@pec.acme.it
 	Commento: CNCPO
 	È stato selezionato questo USER-ID:
-		"Mario Rossi (CNCPO) <filtraggi@pec.acme.it>"
+		"Mario Rossi (CNCPO) <cncpo@pec.acme.it>"
 	
 	Modificare (n)ome, (c)ommento, (e)mail oppure (o)k/(u)scire? **o**
 
@@ -55,11 +55,11 @@ Una volta completato le chiavi pubbliche e private vanno esportate nella cartell
 
 Per la chiave pubblica:
 ```
-# gpg --export --armor -a "cncpo@ehinet.it" > gpg/chiave_pubblica.asc
+# gpg --export --armor -a "cncpo@pec.acme.it" > cncpo/gpg/chiave_pubblica.asc
 ```
 
 Per la chiave privata:
 ```
-# gpg --output gpg/chiave_privata.pgp --armor --export-secret-key filtraggi@pec.acme.it
+# gpg --output gpg/chiave_privata.pgp --armor --export-secret-key cncpo@pec.acme.it
 ```
 

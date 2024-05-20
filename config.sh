@@ -4,43 +4,91 @@
 ##############################
 
 # Lists to be processed
-# Currently available options are: 
-# manuale - For manually added FQDN or IPv4 
+# Currently available options are:
+# manuale - For manually added FQDN or IPv4
 # aams - For AAMS Lists
 # tabacchi - For ADM Lists (Tobacco and Gambling)
 # agcom - For AGCOM Lists (Copyright infringment)
 # cncpo - For CNCPO Lists (anti-pedophilia)
-# consob - For CONSOB Lists (Trading) - Not mandatory
+# consob - For CONSOB Lists (Trading)
 # pscaiip - For Privacy Shield FQDN or IPv4 created by exteral tool provided by AIIP (Associazione Italiana Internet Provider)
 LISTS="manuale aams tabacchi agcom cncpo pscaiip"
 
 # Lists to be downloaded/updated
 # You might use all lists here. To be used to keep old
-# lists active but you don't want to download or update
+# lists active but you don't want to download or update 
 # new records
 UPDATE_LISTS=$LISTS
 
-# CNCPO URL
-URL_cncpo='https://212.14.145.50/'
+
+##################### CNCPO ########################
+# CNCPO PEC IMAP SERVER
+CNCPO_IMAP_SERVER='mail.twtcert.it'
+
+# CNCPO PEC USERNAME
+CNCPO_IMAP_USER='changeme@pecprovider.it'
+
+# CNCPO PEC PASSWORD
+CNCPO_IMAP_PSWD='Shhh Dont tell anyone'
+
+# CNCPO ARCHIVE IMAP FOLDER
+CNCPO_IMAP_ARCHIVE_FOLDER='Archive'
+
+# CNCPO SENDER 
+CNCPO_MAIL_FROM='dipps012.B3L4@pecps.interno.it'
+
+# CNCPO ATTACHMENT FILE NAME
+CNCPO_FILENAME='blacklist.csv.gpg'
+
+# CNCPO ENCRYPTED FILENAME
+CNCPO_FILE_NAME_CRYPT='blacklist.crypted'
+
+# CNCPO DECRYPTED FILENAME
+CNCPO_FILE_NAME_DECRYPT='blacklist.decrypted'
+
+# CNCPO GPG PATH
+CNCPO_GPG_PATH='/usr/bin/gpg'
+
+# CNCPO WORKING DIR
+CNCPO_WORKING_DIR='cncpo'
+
+# CNCPO DOWNLOAD DIR
+CNCPO_DOWNLOAD_DIR='download'
+
+# CNCPO BLACKLIST DIR ** TODO CHECK IF NEEDED
+CNCPO_BLACKLIST_DIR='blacklist'
+
+# CNCPO SETTING TEMPLATE FILE (DO NOT CHANGE)
+CNCPO_SETTINGS_TMPL='settings.yaml.template'
+
+# IMPORT PRIVATE KEY AUTOMATICALLY AT EACH RUN?
+GPG_IMPORT_KEY=true
+
+# GPG PRIVATE KEYFILE TO BE IMPORTED
+GPG_PRIVATE_KEY="gpg/private.gpg"
+
+# GPG KEYFILE PASSWORD
+GPG_KEY_PASSWORD='Shhh Dont tell anyone'
 
 # Local File for CNCPO
 FILE_cncpo='tmp/blacklist.csv'
 
+##################### AGCOM ########################
+# AGCOM URL
+URL_agcom='https://www.agcom.it/provvedimenti-a-tutela-del-diritto-d-autore'
+
 # Local File for AGCOM
-# Updated via download_agcom.py script
 FILE_agcom='lista.agcom'
 
 # Skip SHA256 Checks 
-SKIP_SHA256_CKSUM=false
+SKIP_SHA256_CKSUM=true
 
-# Local file for Consob list
-# Updated via download_consob.py script
-# -- Not mandatory until explicit request from Consob --
-FILE_consob='lista.consob'
-
+##################### MANUALE ########################
 # Local file for Manuale
 FILE_manuale='lista.manuale'
 
+
+##################### PSCAIIP ########################
 # Local file for Piracy Shield Client by AAIP
 PATH_pscaiip='/opt/piracy-shield-agent-main/'
 
@@ -59,16 +107,18 @@ PSCAIIP_RANDOM_SLEEP=true
 # Maximum sleep time in seconds (default 30)
 PSCAIIP_MAXWAIT=30
 
-# curl options
-CERTS_cncpo='-k --cert cncpo.pem --key cncpo.key --cacert cncpo-ca.pem'
+##################### CONSOB ########################
+# Local file for Consob list
+FILE_consob='lista.consob'
 
-# curl options for cncpo
-CURL_OPTS_cncpo="$CERTS_cncpo"
-
+##################### AAMS ########################
 # curl options for aams
 CURL_OPTS_aams=''
 
+
+##################### DNS SECTION ########################
 # path of the file on each remote target DNS server
+
 CONFFILE='/etc/bind/censura/named.conf'
 
 # list of target DNS servers
@@ -89,18 +139,13 @@ CONFDIR='/etc/bind/censura'
 ############ External Tools
 
 # Download Helper for agcom
-# download from https://github.com/mphilosopher/censura/blob/master/src/download_agcom.py
 AGCOM_DOWNLOAD_HELPER='download_agcom.py'
 
 # Download Helper for consob
-# download from https://github.com/mphilosopher/censura/blob/master/src/download_consob.py
 CONSOB_DOWNLOAD_HELPER='download_consob.py'
 
-# Tool for cidr summarization
-AGGREGATION_TOOL='supernets.py'
-
-# Maximum CIDR length (default 25)
-AGGREGATION_MAXLEN=25
+# Download Helper for CNCPO (in CNCPO_WORKING_DIR)
+CNCPO_DOWNLOAD_HELPER='download_attachment.py'
 
 ############ Blackholing
 
@@ -115,6 +160,12 @@ AGGREGATE_PREFIX=true
 
 # Aggregated prefix list path
 AGGREGATE_LIST_FILE='lists/cidr-fullist'
+
+# Tool for cidr summarization
+AGGREGATION_TOOL='supernets.py'
+
+# Maximum CIDR length (default 25)
+AGGREGATION_MAXLEN=25
 
 ############ Logging
 
@@ -131,5 +182,6 @@ LOGFILE='/var/log/kit-censura.log'
 ALERT_ENABLE=true
 # insert NOC email to enable alerting
 NOC_EMAIL=''
+#NOC_EMAIL=''
 # sender address
 FROM_EMAIL='cncpo@connesi.it'
