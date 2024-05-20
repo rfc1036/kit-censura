@@ -108,10 +108,10 @@ CNCPO_REPLY_USERNAME=$CNCPO_IMAP_USER
 CNCPO_REPLY_PASSWORD=$CNCPO_IMAP_PSWD
 
 # Message Template.
-# Underscore variables (_LISTAID_ and _DATE_) will be replaced automatically
+# Underscore variables (_LISTAID_ , _LISTADATE_ and _DATE_) will be replaced automatically
 CNCPO_REPLY_TEMPLATE="Buongiorno,
-con la presente si segnala avvenuta ricezione e applicazione della lista dei siti da inibire per il CNCPO con identificativo _LISTAID_ del _DATE_.
-Il messaggio e stato generato automaticamente. Vi preghiamo di segnalare qualsiasi eventuale problema o incorrettezza della presente segnalazione.
+con la presente si segnala che in data _DATE_ e' avvenuta ricezione e applicazione della lista dei siti da inibire per il CNCPO avente progressivo _LISTAID_ e identificativo _LISTADATE_.
+Il messaggio e stato generato automaticamente, pertanto vi preghiamo di segnalare qualsiasi eventuale problema o incorrettezza del presente riscontro.
 
 Cordiali Saluti.
 Acme S.p.A.
