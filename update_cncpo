@@ -32,9 +32,8 @@ if [ $? != 0 ] ; then
 else
 	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Successfully checked CNCPO lists" >> $LOGFILE
 fi	
-###############################
 
-#################################
+# check if there is new list downloaded
 if [ -e $CNCPO_DOWNLOAD_DIR/$CNCPO_FILE_NAME_CRYPT ] ; then 
 	
 	# import key
@@ -69,17 +68,18 @@ if [ -e $CNCPO_DOWNLOAD_DIR/$CNCPO_FILE_NAME_CRYPT ] ; then
 	fi
 	
 	# copy files 
-	mv $CNCPO_DOWNLOAD_DIR/$CNCPO_FILE_NAME_DECRYPT $FILE_cncpo
-	
+	mv $CNCPO_DOWNLOAD_DIR/$CNCPO_FILE_NAME_DECRYPT ../$FILE_cncpo
+	# delete encrypted copy
+	rm $CNCPO_DOWNLOAD_DIR/$CNCPO_FILE_NAME_CRYPT
 	
 	# Parse header for answer
-	LISTAID=$(head -1 $FILE_cncpo)
+	LISTAID=$(head -1 ../$FILE_cncpo | cut -d\; -f1)
+	LISTADATE=$(head -1 ../$FILE_cncpo | cut -d\; -f2)
 	
 	
 	# answer
 	if [ $CNCPO_REPLY_ENABLED == true ] ; then 
-		# TODO: INSERT LISTAID
-		echo "$CNCPO_REPLY_TEMPLATE" | sed "s/_LISTAID_/$LISTAID/g" | sed "s/_DATE_/$(date)/g" | python $CNCPO_EMAIL_SENDER
+		echo "$CNCPO_REPLY_TEMPLATE" | sed "s/_LISTAID_/$LISTAID/g" | sed "s/_LISTADATE_/$LISTADATE/g" | sed "s/_DATE_/$(date)/g" | python $CNCPO_EMAIL_SENDER
 		
 		if [ $? != 0 ] ; then
 			SUBJECT="Error while sending reply message to CNCPO"
