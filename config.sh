@@ -191,6 +191,9 @@ CONSOB_DOWNLOAD_HELPER='download_consob.py'
 # Download Helper for CNCPO (in CNCPO_WORKING_DIR)
 CNCPO_DOWNLOAD_HELPER='download_attachment.py'
 
+# Reply Helper for CNCPO (in CNCPO_WORKING_DIR)
+CNCPO_EMAIL_SENDER='email_sender.py'
+
 ############ Blackholing
 
 # Lists to be applied for blackholing
