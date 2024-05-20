@@ -60,6 +60,9 @@ Per la chiave pubblica:
 
 Per la chiave privata:
 ```
-# gpg --output gpg/chiave_privata.pgp --armor --export-secret-key cncpo@pec.acme.it
+# gpg --output gpg/private.gpg --armor --export-secret-key cncpo@pec.acme.it
 ```
 
+
+La chiave privata va importata nel sistema oppure copiata nella cartella cncpo/gpg per l'importazione automatica
+Maggiori dettagli nel config file.
