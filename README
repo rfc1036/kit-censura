@@ -34,7 +34,7 @@ following command:
 	python3-urllib3 python3-bs4 python3-requests libfile-slurp-perl \
 	rsync wget perl libregexp-common-perl liblist-moreutils-perl \
 	python3-click python3-soupsieve python3-orderedattrdict \
-	python3-tldextract pip curl python3-yaml python3-imaplib2
+	python3-tldextract pip curl python3-yaml python3-imaplib2 iproute2
 	
 	
 and since url extract isn't available as a package: 
@@ -77,7 +77,7 @@ Start from censorship-get and then censorship-apply.
 
 Before starting make sure to run the bootstrap script in working path:
 
-bash bootstrap.sh
+# bash bootstrap.sh
 
 The install-routes-linux script can be run directly on a border router
 or on a system where a dynamic routing protocol will redistribute the
