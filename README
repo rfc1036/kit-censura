@@ -22,10 +22,25 @@ install-routes-linux: iproute
 parse_aams:  Regexp::Common >= 2013031201, List::MoreUtils, File::Slurp
 parse_agcom: Regexp::Common >= 2013031201, List::MoreUtils, File::Slurp
 parse_cncpo: Text::CSV >= 0.32
-update_*: wget
+update_*: wget curl
 upload-bind-config: rsync (local and remote), BIND (remote)
 upload-unbound-config: rsync (local and remote), Unbound (remote)
 python version >= 3.0
+
+if you are using debian or ubuntu you can install all dependencies with the
+following command:
+
+# apt-get install python3 python3-openssl python3-requests-unixsocket \
+	python3-urllib3 python3-bs4 python3-requests libfile-slurp-perl \
+	rsync wget perl libregexp-common-perl liblist-moreutils-perl \
+	python3-click python3-soupsieve python3-orderedattrdict \
+	python3-tldextract pip curl python3-yaml python3-imaplib2
+	
+	
+and since url extract isn't available as a package: 
+
+# pip install urlextract
+
 
 ** External sources **
 
@@ -67,6 +82,12 @@ bash bootstrap.sh
 The install-routes-linux script can be run directly on a border router
 or on a system where a dynamic routing protocol will redistribute the
 static routes it installs.
+
+BIG WARNING: This project is meant to be a TOOLKIT to meet the legal 
+requirements of censorship in Italy and IT IS NOT meant to be used as 
+it is or as a stand-alone all-in-one solution. 
+It must be adapted and customised to YOUR systems and needs. 
+Feel free to modify, enable and disable features as needed.
 
 ** Cron requirements **
 
