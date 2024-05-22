@@ -53,8 +53,8 @@ if [ -e $CNCPO_DOWNLOAD_DIR/$CNCPO_FILE_NAME_CRYPT ] ; then
 	fi
 	
 	# decrypt
-	$CNCPO_GPG_PATH --batch --passphrase $GPG_KEY_PASSWORD --decrypt $CNCPO_DOWNLOAD_DIR/$CNCPO_FILE_NAME_CRYPT -o $CNCPO_DOWNLOAD_DIR/$CNCPO_FILE_NAME_DECRYPT
-	if [ $? != 0 ] ; then
+	$CNCPO_GPG_PATH --batch --passphrase $GPG_KEY_PASSWORD -o $CNCPO_DOWNLOAD_DIR/$CNCPO_FILE_NAME_DECRYPT --decrypt $CNCPO_DOWNLOAD_DIR/$CNCPO_FILE_NAME_CRYPT 
+	if [ $? != 0 ] && [ ! -e $CNCPO_DOWNLOAD_DIR/$CNCPO_FILE_NAME_DECRYPT ] ; then
 		NEWFILENAME="$CNCPO_DOWNLOAD_DIR/$CNCPO_FILE_NAME_CRYPT.undecifrable-$(date +%Y%m%d%H%M)"
 		SUBJECT="Error while decrypting list"
 		TXT="Unable to decrypt file $CNCPO_FILE_NAME_CRYPT with GPG Keyfile $GPG_PRIVATE_KEY. The file was moved to $NEWFILENAME"
