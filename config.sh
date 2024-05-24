@@ -81,13 +81,13 @@ GPG_PRIVATE_KEY="gpg/private.gpg"
 GPG_KEY_PASSWORD='Shhh Dont tell anyone'
 
 # GPG Import Args
-GPG_IMPORT_ARGS="--batch --passphrase $GPG_KEY_PASSWORD"
+GPG_IMPORT_ARGS="--batch --pinentry-mode loopback --passphrase $GPG_KEY_PASSWORD"
 
 # Local File for CNCPO
 FILE_cncpo='tmp/blacklist.csv'
 
 # GPG Decrypt Args
-GPG_DECRYPT_ARGS="--batch --passphrase $GPG_KEY_PASSWORD"
+GPG_DECRYPT_ARGS="--batch --pinentry-mode loopback --passphrase $GPG_KEY_PASSWORD"
 
 # SEND Automatic Reply?
 CNCPO_REPLY_ENABLED=true
