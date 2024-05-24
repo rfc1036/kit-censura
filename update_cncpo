@@ -39,7 +39,7 @@ if [ -e $CNCPO_DOWNLOAD_DIR/$CNCPO_FILE_NAME_CRYPT ] ; then
 	# import key
 	if [ $GPG_IMPORT_KEY == true ] ; then 
 		test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - CNCPO Key Import Started" >> $LOGFILE
-		$CNCPO_GPG_PATH --batch --passphrase $GPG_KEY_PASSWORD --import $GPG_PRIVATE_KEY &>> $LOGFILE
+		$CNCPO_GPG_PATH $GPG_IMPORT_ARGS --import $GPG_PRIVATE_KEY &>> $LOGFILE
 		if [ $? != 0 ] ; then
 			SUBJECT="Error while importing GPG Keyfile $GPG_PRIVATE_KEY"
 			TXT='Unable to import GPG Keyfile $GPG_PRIVATE_KEY'
@@ -53,7 +53,7 @@ if [ -e $CNCPO_DOWNLOAD_DIR/$CNCPO_FILE_NAME_CRYPT ] ; then
 	fi
 	
 	# decrypt
-	$CNCPO_GPG_PATH --batch --passphrase $GPG_KEY_PASSWORD -o $CNCPO_DOWNLOAD_DIR/$CNCPO_FILE_NAME_DECRYPT --decrypt $CNCPO_DOWNLOAD_DIR/$CNCPO_FILE_NAME_CRYPT 
+	$CNCPO_GPG_PATH $GPG_DECRYPT_ARGS -o $CNCPO_DOWNLOAD_DIR/$CNCPO_FILE_NAME_DECRYPT --decrypt $CNCPO_DOWNLOAD_DIR/$CNCPO_FILE_NAME_CRYPT 
 	if [ $? != 0 ] && [ ! -e $CNCPO_DOWNLOAD_DIR/$CNCPO_FILE_NAME_DECRYPT ] ; then
 		NEWFILENAME="$CNCPO_DOWNLOAD_DIR/$CNCPO_FILE_NAME_CRYPT.undecifrable-$(date +%Y%m%d%H%M)"
 		SUBJECT="Error while decrypting list"
