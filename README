@@ -44,12 +44,16 @@ following command:
 	rsync wget perl libregexp-common-perl liblist-moreutils-perl \
 	python3-click python3-soupsieve python3-orderedattrdict \
 	python3-tldextract pip curl python3-yaml python3-imaplib2 iproute2
-	
-	
+		
 and since url extract isn't available as a package: 
 
 # pip install urlextract
 
+or 
+
+# pip install urlextract --break-system-packages
+
+if needed by your system.
 
 ** External sources **
 
