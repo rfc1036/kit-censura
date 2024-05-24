@@ -10,7 +10,7 @@
 # tabacchi - For ADM Lists (Tobacco and Gambling)
 # agcom - For AGCOM Lists (Copyright infringment)
 # cncpo - For CNCPO Lists (anti-pedophilia)
-# consob - For CONSOB Lists (Trading) - Not Mandatory
+# consob - For CONSOB Lists (Trading) - Not Mandatory and BROKEN right now since they have implemented anti-bot protection.
 # pscaiip - For Privacy Shield FQDN or IPv4 created by exteral tool provided by AIIP (Associazione Italiana Internet Provider)
 LISTS="manuale aams tabacchi agcom consob cncpo pscaiip"
 

@@ -15,6 +15,17 @@ This suite of programs implements by-domain and by-IP censorship of the
 Internet. It is designed to be able to accomodate multiple blacklists
 and be easily extensible.
 
+** Lists of Modules Supported by this software **
+
+- aams - Agenzia Dogane e Monopoli - Gambling - list available on https://www.adm.gov.it/portale/siti-web-inibiti-giochi
+- tabacchi - Agenzia Dogane e Monopoli - Tobacco Control - list available on https://www.adm.gov.it/portale/siti-inibiti-tabacchi
+- agcom - Autorita' per le garanzie nelle comunicazioni  - Copyright infringment - list available on https://www.agcom.it/provvedimenti-a-tutela-del-diritto-d-autore
+- cncpo - Centro Nazionale Controllo Peodopornografia Online - Child Pornography - list NOT available to the public
+- consob - Commissione Nazionale per le Società e la Borsa - Trading - list available on https://www.consob.it/web/area-pubblica/oscuramenti (BROKEN due CAPTCHA)
+- pscaiip - Piracy Shield Client implementation by A.I.I.P. - Copyright infringment - list not available yet
+- manuale - Self-managed list for custom entries 
+
+Each module can be enabled or disabled as needed.
 
 ** Requirements **
 
