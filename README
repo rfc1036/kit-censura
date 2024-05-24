@@ -21,11 +21,9 @@ and be easily extensible.
 - tabacchi - Agenzia Dogane e Monopoli - Tobacco Control - list available on https://www.adm.gov.it/portale/siti-inibiti-tabacchi
 - agcom - Autorita' per le garanzie nelle comunicazioni  - Copyright infringment - list available on https://www.agcom.it/provvedimenti-a-tutela-del-diritto-d-autore
 - cncpo - Centro Nazionale Controllo Peodopornografia Online - Child Pornography - list NOT available to the public
-- consob - Commissione Nazionale per le Società e la Borsa - Trading - list available on https://www.consob.it/web/area-pubblica/oscuramenti (BROKEN due CAPTCHA)
+- consob - Commissione Nazionale per le Società e la Borsa - Trading - list available on https://www.consob.it/web/area-pubblica/oscuramenti (BROKEN due Anti-Bot protection)
 - pscaiip - Piracy Shield Client implementation by A.I.I.P. - Copyright infringment - list not available yet
 - manuale - Self-managed list for custom entries 
-
-Each module can be enabled or disabled as needed.
 
 ** Requirements **
 
