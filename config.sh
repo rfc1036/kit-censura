@@ -65,9 +65,6 @@ CNCPO_WORKING_DIR='cncpo'
 # CNCPO DOWNLOAD DIR
 CNCPO_DOWNLOAD_DIR='download'
 
-# CNCPO BLACKLIST DIR ** TODO CHECK IF NEEDED
-CNCPO_BLACKLIST_DIR='blacklist'
-
 # CNCPO SETTING TEMPLATE FILE (DO NOT CHANGE)
 CNCPO_SETTINGS_TMPL='settings.yaml.template'
 
@@ -92,16 +89,16 @@ GPG_DECRYPT_ARGS="--batch --pinentry-mode loopback --passphrase $GPG_KEY_PASSWOR
 # SEND Automatic Reply?
 CNCPO_REPLY_ENABLED=true
 
-# Subject 
+# Reply message Subject 
 CNCPO_REPLY_SUBJECT="Messaggio di avvenuta ricezione lista filtraggi CNCPO"
 
-# Sender 
+# Reply message Sender
 CNCPO_REPLY_SENDER=$CNCPO_IMAP_USER
 
-# Destination 
+# Reply message Recipient
 CNCPO_REPLY_DESTINATION=$CNCPO_MAIL_FROM
 
-# Put NOC In Copy
+# Put NOC In Copy of Reply message
 CNCPO_REPLY_CC=$NOC_EMAIL
 
 # SNMP Server
@@ -113,7 +110,7 @@ CNCPO_REPLY_USERNAME=$CNCPO_IMAP_USER
 # SNMP Authentication PASSWORD
 CNCPO_REPLY_PASSWORD=$CNCPO_IMAP_PSWD
 
-# Message Template.
+# Reply Message Template.
 # Underscore variables (_LISTAID_ , _LISTADATE_ and _DATE_) will be replaced automatically
 CNCPO_REPLY_TEMPLATE="Buongiorno,
 con la presente si segnala che in data _DATE_ e' avvenuta ricezione e applicazione della lista dei siti da inibire per il CNCPO avente progressivo _LISTAID_ e identificativo _LISTADATE_.
