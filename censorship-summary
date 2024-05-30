@@ -12,7 +12,8 @@ TOTAL=0
 for list in $LISTS; do
 	RECORDS=$(cat lists/$list | sort | uniq | wc -l | cut -d\  -f1)
 	echo "$(date '+%d/%m/%y %H:%M:%S') - List $list - No.Records: $RECORDS" >> $LOGFILE	
-	(((TOTAL = TOTAL+RECORDS)))	
+	#(((TOTAL = TOTAL+RECORDS)))
+	TOTAL=$(wc -l $CONF | cut -d\  -f1)	
 done
-echo "$(date '+%d/%m/%y %H:%M:%S') - Total urls: $TOTAL." >> $LOGFILE
+echo "$(date '+%d/%m/%y %H:%M:%S') - Total unique urls: $TOTAL." >> $LOGFILE
 echo "$(date '+%d/%m/%y %H:%M:%S') - Censorship Summary ended." >> $LOGFILE
