@@ -57,7 +57,8 @@ if needed by your system.
 
 ** External sources **
 
-Download helpers download_agcom.py and download_consob.py from https://github.com/mphilosopher/censura
+Download helpers download_agcom.py and download_consob.py initial version from https://github.com/mphilosopher/censura
+Agcom downloader updated by Federico Santuilli - NHM S.r.l.
 
 ** Author **
 
