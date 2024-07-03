@@ -154,6 +154,9 @@ PSCAIIP_RANDOM_SLEEP=true
 # Maximum sleep time in seconds (default 30)
 PSCAIIP_MAXWAIT=30
 
+# Send Email on PSC ERROR?
+ALERT_PSCAIIP_ENABLE=true
+
 ##################### CONSOB ########################
 # Local file for Consob list
 FILE_consob='lista.consob'

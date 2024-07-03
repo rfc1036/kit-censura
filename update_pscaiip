@@ -5,28 +5,52 @@ source config.sh
 cd $PATH_pscaiip
 
 test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Invoking AAIP Privacy Shield Client" >> $LOGFILE
+iptables -t nat -D POSTROUTING -d 10.253.254.20 -j SNAT --to 10.255.0.6 &> /dev/null
+iptables -t nat -I POSTROUTING  1 -d 10.253.254.20 -j SNAT --to 10.255.0.6 &> /dev/null
+iptables -t nat -D POSTROUTING -d 10.252.4.20 -j SNAT --to 10.255.0.6 &> /dev/null
+iptables -t nat -I POSTROUTING  1 -d 10.252.4.20 -j SNAT --to 10.255.0.6 &> /dev/null
+
 
 if [ $PSCAIIP_RANDOM_SLEEP == 'true' ] ; then
-        SLEEP=$((RANDOM % $PSCAIIP_MAXWAIT))
-        test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Random wait enabled: waiting for $SLEEP seconds" >> $LOGFILE
-        sleep $SLEEP;
+	SLEEP=$((RANDOM % $PSCAIIP_MAXWAIT))
+	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Random wait enabled: waiting for $SLEEP seconds" >> $LOGFILE
+	sleep $SLEEP;
 fi
 
-docker-compose exec app bash -c "php application schedule:run" >> $LOGFILE
+echo "$(date '+%d/%m/%y %H:%M:%S') - docker-compose exec app bash -c \"php application psc:run\"" >> $LOGFILE
+# too verbose for logfile
+docker-compose exec app bash -c "php application psc:run" &> /dev/null
 DOCKER_RETURN=$?
 
 
 if [ $DOCKER_RETURN != 0 ] ; then
    SUBJECT="Error while running Privacy Shield Client"
-   TXT="Privacy Shield Client on $(hostname --fqdn) have failed and returned $DOCKER_RETURN"
-   if [ $ALERT_ENABLE == true ] && [ "x$NOC_EMAIL" != 'x' ] ; then
+   TXT="Privacy Shield Client on $(hostname --fqdn) psc:run have failed and returned $DOCKER_RETURN"
+   if [ $ALERT_ENABLE == true ] && [ "x$NOC_EMAIL" != 'x' ] && [ $ALERT_PSCAIIP_ENABLE == true ] ; then
 	echo -e "Subject: $SUBJECT\nFrom:$FROM_EMAIL\n$TXT" | sendmail $NOC_EMAIL
    fi
-   test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - AAIP Privacy Shield Client returned Error: $TXT" >> $LOGFILE
+   test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - AAIP Privacy Shield Client Run returned Error: $TXT" >> $LOGFILE
    echo "Warning: $TXT" >&2
 else
-    test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - AAIP Privacy Shield Client Ended" >> $LOGFILE
+    test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - AAIP Privacy Shield Client Run Ended" >> $LOGFILE
 fi
+
+echo "$(date '+%d/%m/%y %H:%M:%S') - docker-compose exec app bash -c \"php application psc:process-queue\"" >> $LOGFILE
+docker-compose exec app bash -c "php application psc:process-queue" >> $LOGFILE
+DOCKER_RETURN_QUEUE=$?
+
+if  [ $DOCKER_RETURN_QUEUE != 0 ] ; then
+   SUBJECT="Error while running Privacy Shield Client"
+   TXT="Privacy Shield Client on $(hostname --fqdn) process-queue have failed and returned $DOCKER_RETURN_QUEUE"
+   if [ $ALERT_ENABLE == true ] && [ "x$NOC_EMAIL" != 'x' ] && [ $ALERT_PSCAIIP_ENABLE == true ] ; then
+        echo -e "Subject: $SUBJECT\nFrom:$FROM_EMAIL\n$TXT" | sendmail $NOC_EMAIL
+   fi
+   test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - AAIP Privacy Shield Client returned Error during Process-Queue: $TXT" >> $LOGFILE
+   echo "Warning: $TXT" >&2
+else
+    test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - AAIP Privacy Shield Client Process-Queue Ended" >> $LOGFILE
+fi
+
 cd /root/kit-censura
 
 #copying files from AAIP Privacy Shield Client
