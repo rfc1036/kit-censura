@@ -76,6 +76,7 @@ def main():
                 for url in extractor.find_urls(content):
                     ext = extract(url)
                     if ext.domain == "consob" and ext.suffix == "it": continue
+                    if ext.domain == "europa" and ext.suffix == "eu": continue
                     url = (ext.subdomain+"."+ext.domain+"."+ext.suffix) if ext.subdomain != "" else (ext.domain+"."+ext.suffix)
                     urls.append(url)
         curpage = curpage + 1
