@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# -Written without shame by ChatGPT-
+# ---------------------------
+# Written by IA
+# ---------------------------
 
 import re
 import sys
