@@ -19,9 +19,9 @@ and be easily extensible.
 
 - aams - Agenzia Dogane e Monopoli - Gambling - list available on https://www.adm.gov.it/portale/siti-web-inibiti-giochi
 - tabacchi - Agenzia Dogane e Monopoli - Tobacco Control - list available on https://www.adm.gov.it/portale/siti-inibiti-tabacchi
-- agcom - Autorita' per le garanzie nelle comunicazioni  - Copyright infringment - list available on https://www.agcom.it/provvedimenti-a-tutela-del-diritto-d-autore
+- agcom - Autorita' per le garanzie nelle comunicazioni  - Copyright infringment - list available on https://www.agcom.it/provvedimenti-a-tutela-del-diritto-d-autore (AGCOM don't update the website)
 - cncpo - Centro Nazionale Controllo Peodopornografia Online - Child Pornography - list NOT available to the public
-- consob - Commissione Nazionale per le Società e la Borsa - Trading - list available on https://www.consob.it/web/area-pubblica/oscuramenti (BROKEN due Anti-Bot protection)
+- consob - Commissione Nazionale per le Società e la Borsa - Trading - list available on https://www.consob.it/web/area-pubblica/oscuramenti
 - pscaiip - Piracy Shield Client implementation by A.I.I.P. - Copyright infringment - list not available yet
 - manuale - Self-managed list for custom entries 
 
@@ -54,11 +54,6 @@ or
 # pip install urlextract --break-system-packages ; pip install ua-generator --break-system-packages
 
 if needed by your system.
-
-** External sources **
-
-Download helpers download_agcom.py and download_consob.py initial version from https://github.com/mphilosopher/censura
-Download helpers updated by Federico Santulli - NHM S.r.l. (thanks!)
 
 ** Author **
 
