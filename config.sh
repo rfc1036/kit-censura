@@ -165,9 +165,8 @@ ALERT_PSCAIIP_ENABLE=true
 FILE_consob='lista.consob'
 
 ##################### AAMS ########################
-# curl options for aams
-CURL_OPTS_aams=''
-
+# Local file for Aams list
+FILE_consob='lista.aams'
 
 ##################### DNS SECTION ########################
 # path of the file on each remote target DNS server
@@ -196,6 +195,9 @@ AGCOM_DOWNLOAD_HELPER='download_agcom.py'
 
 # Download Helper for consob
 CONSOB_DOWNLOAD_HELPER='download_consob.py'
+
+# Download Helper for aams
+CONSOB_DOWNLOAD_HELPER='download_aams.py'
 
 # Download Helper for CNCPO (in CNCPO_WORKING_DIR)
 CNCPO_DOWNLOAD_HELPER='download_attachment.py'
