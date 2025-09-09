@@ -1,9 +1,47 @@
 #!/bin/bash
-# Documented on:
-# https://www1.agenziadoganemonopoli.gov.it/siti_inibiti_tabacchi.htm
 
-source common_aams.sh
-URL_aams="https://www.adm.gov.it/portale/siti-inibiti-tabacchi"
+source config.sh
 
-download_aams lists/tabacchi.new 
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Downloading Tabacchi List" >> $LOGFILE
 
+# TODO make your own script
+if [ -e $TABACCHI_DOWNLOAD_HELPER ] ; then 
+	python $TABACCHI_DOWNLOAD_HELPER -o lists/tabacchi.new.tmp
+else 
+	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Tabacchi Error: Helper $Tabacchi_DOWNLOAD_HELPER not found. See README" >> $LOGFILE
+	exit
+fi
+CURL_RETURN=$?
+
+if [ $CURL_RETURN != 0 ] ; then
+        SUBJECT="Error while fetching Tabacchi lists"
+        TXT="download_tabacchi.py on $(hostname --fqdn) have returned $CURL_RETURN when trying to parse the CMS"
+        if [ $ALERT_ENABLE == true ] && [ "x$NOC_EMAIL" != 'x' ] ; then
+	        echo -e "Subject: $SUBJECT\nFrom:$FROM_EMAIL\n$TXT" | sendmail $NOC_EMAIL
+	fi
+	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Tabacchi Error: $TXT" >> $LOGFILE
+	echo "Warning: $TXT" >&2
+	exit 255
+
+fi
+
+
+cat lists/tabacchi.new.tmp | tr '[:upper:]' '[:lower:]' | sort | uniq > $FILE_tabacchi
+rm lists/tabacchi.new.tmp
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Tabacchi List Downloaded" >> $LOGFILE
+
+if [ -e "$FILE_tabacchi" ]; then
+  egrep '^[^#]' $FILE_tabacchi | sed 's~http[s]*://~~g' | sort | uniq > lists/tabacchi.new.tmp
+  mv lists/tabacchi.new.tmp lists/tabacchi.new
+   test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Imported list of IP  $FILE_tabacchi" >> $LOGFILE
+elif [ ! -e lists/tabacchi.new ]; then
+  : > lists/tabacchi.new
+fi
+
+# allow manual add of specific IPs if file exists (ex lista.tabacchi-ip)
+  if [ -e $FILE_tabacchi-ip ]; then
+        egrep '^[^#]' $FILE_tabacchi-ip | sort | uniq > lists/tabacchi-ip
+	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Imported list of IP  $FILE_tabacchi-ip" >> $LOGFILE
+  fi
+
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Import tabacchi Completed" >> $LOGFILE
