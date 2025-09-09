@@ -1,9 +1,47 @@
 #!/bin/bash
+  
+source config.sh
 
-source common_aams.sh
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Downloading Aams List" >> $LOGFILE
+
+# TODO make your own script
+if [ -e $AAMS_DOWNLOAD_HELPER ] ; then
+        python $AAMS_DOWNLOAD_HELPER -o lists/aams.new.tmp
+else
+        test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - AAMS Error: Helper $AAMS_DOWNLOAD_HELPER not found. See README" >> $LOGFILE
+        exit
+fi
+CURL_RETURN=$?
+
+if [ $CURL_RETURN != 0 ] ; then
+        SUBJECT="Error while fetching AAMS lists"
+        TXT="download_aams.py on $(hostname --fqdn) have returned $CURL_RETURN when trying to parse the CMS"
+        if [ $ALERT_ENABLE == true ] && [ "x$NOC_EMAIL" != 'x' ] ; then
+                echo -e "Subject: $SUBJECT\nFrom:$FROM_EMAIL\n$TXT" | sendmail $NOC_EMAIL
+        fi
+        test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - AAMS Error: $TXT" >> $LOGFILE
+        echo "Warning: $TXT" >&2
+        exit 255
+
+fi
 
 
-URL_aams="https://www.adm.gov.it/portale/siti-web-inibiti-giochi"
+cat lists/aams.new.tmp | tr '[:upper:]' '[:lower:]' | sort | uniq > $FILE_aams
+rm lists/aams.new.tmp
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - AAMS List Downloaded" >> $LOGFILE
 
-download_aams lists/aams.new
+if [ -e "$FILE_aams" ]; then
+  egrep '^[^#]' $FILE_aams | sed 's~http[s]*://~~g' | sort | uniq > lists/aams.new.tmp
+  mv lists/aams.new.tmp lists/aams.new
+   test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Imported list of IP  $FILE_aams" >> $LOGFILE
+elif [ ! -e lists/aams.new ]; then
+  : > lists/aams.new
+fi
 
+# allow manual add of specific IPs if file exists (ex lista.aams-ip)
+  if [ -e $FILE_aams-ip ]; then
+        egrep '^[^#]' $FILE_aams-ip | sort | uniq > lists/aams-ip
+        test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Imported list of IP  $FILE_aams-ip" >> $LOGFILE
+  fi
+
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Import aams Completed" >> $LOGFILE
