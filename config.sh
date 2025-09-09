@@ -121,22 +121,17 @@ Acme S.p.A.
 "
 
 ##################### AGCOM ########################
-# AGCOM URL
-#URL_agcom='https://www.agcom.it/provvedimenti-a-tutela-del-diritto-d-autore'
-
-# UPDATE: Since agcom changed his website to one that is un-parsable, the agcom list has to become manually updated. 
-# Just put your FQDN lists in the lista.agcom file.
-
 # Local File for AGCOM
 FILE_agcom='lista.agcom'
 
-# Skip SHA256 Checks 
-#SKIP_SHA256_CKSUM=true
+# AGCOM publish the DDAs one year behind. 
+# Do you want to update $FILE_agcom by hand instead of downloading it? Just put 'yes' here
+AGCOM_MANUAL='no'
+
 
 ##################### MANUALE ########################
 # Local file for Manuale
 FILE_manuale='lista.manuale'
-
 
 
 ##################### PSCAIIP ########################
