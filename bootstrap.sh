@@ -4,7 +4,7 @@ chmod +x download_*.py
 
 echo Creating new empty files:
 
-for lista in manuale consob agcom aams tabacchi pscaiip; do
+for lista in manuale consob agcom aams tabacchi pscaiip ; do
 	touch lista.$lista
 	touch lista.$lista-ip
 done
