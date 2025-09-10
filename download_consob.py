@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# ---------------------------
-# Written by IA
-# ---------------------------
 
 import re
 import sys
@@ -351,3 +348,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

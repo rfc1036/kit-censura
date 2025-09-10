@@ -60,9 +60,12 @@ if needed by your system.
 Copyright 2008-2024 by Seeweb s.r.l.
 Originally Written by Marco d'Itri <md@Linux.IT>.
 
-Alerting and Logging by Antonio Bartolini <antonio.bartolini@connesi.it>
-Privacy Shield Client by AAIP integration by Antonio Bartolini <antonio.bartolini@connesi.it>
-CNCPO PEC Download Helper by Antonio Bartolini <antonio.bartolini@connesi.it>
+- Alerting and Logging
+- Privacy Shield Client by AAIP integration
+- CNCPO PEC Download Helper
+- AGCOM, ADM and Consob parsers 
+- Many more bugfix and features
+Written by Antonio Bartolini <antonio.bartolini@connesi.it>
 
 supernets.py script from  https://github.com/grelleum/supernets
 

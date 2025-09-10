@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# ---------------------------
-# Written by IA
-# ---------------------------
+
 import sys
 import re
 import os
@@ -122,7 +120,6 @@ def is_txt_url(u: str) -> bool:
     path = urlparse(u).path.lower()
     if path.endswith(".txt"):
         return True
-    # a volte c'è un "download?..." con parametro che contiene .txt
     q = parse_qs(urlparse(u).query)
     for vals in q.values():
         for v in vals:
@@ -243,8 +240,43 @@ def pick_latest_post_with_allegato_b(listing_url, timeout, verbose=False, max_ca
 # ---------------------------
 # Post-processing del TXT
 # ---------------------------
-# Righe di versione tipo: "0000311_2024.06.06" o con "-" al posto di "_"
 VERSION_LINE_RE = re.compile(r"^\s*\d{5,}[_-]\d{4}\.\d{2}\.\d{2}\s*$")
+
+def clean_sort_dedupe_domains(text):
+    """
+    - Rimuove QUALSIASI riga che corrisponde al pattern versione
+      (es. 0000311_2024.06.06), ovunque si trovi nel file
+    - Normalizza: strip, minuscolo, toglie eventuale punto finale
+    - Deduplica e ordina
+    - Ritorna testo con LF finale
+    """
+    lines = text.split("\n")
+
+    cleaned = []
+    seen = set()
+    for ln in lines:
+        # normalizza whitespace ed EOL già gestiti a monte
+        s = ln.strip()
+        if not s:
+            continue
+        # **NUOVO**: scarta la riga di versione ovunque sia
+        if VERSION_LINE_RE.match(s):
+            continue
+
+        s = s.lower()
+        # opzionale: togli punto finale residuo
+        if s.endswith("."):
+            s = s[:-1]
+        # ignora eventuali commenti
+        if s.startswith("#"):
+            continue
+
+        if s not in seen:
+            seen.add(s)
+            cleaned.append(s)
+
+    cleaned.sort()
+    return "\n".join(cleaned) + ("\n" if cleaned else "")
 
 def bytes_to_text_normalized(data, headers):
     """
@@ -268,47 +300,12 @@ def bytes_to_text_normalized(data, headers):
         except Exception:
             text = data.decode("utf-8", errors="replace")
 
-    # Normalizza EOL: CRLF/CR -> LF (toglie i ^M)
+    # Normalizza EOL: CRLF/CR -> LF
     text = text.replace("\r\n", "\n").replace("\r", "\n")
-    # Rimuovi BOM residuo
+    # Rimuovi BOM se rimasto
     if text.startswith("\ufeff"):
         text = text.lstrip("\ufeff")
     return text
-
-def clean_sort_dedupe_domains(text):
-    """
-    - Rimuove QUALSIASI riga che corrisponde al pattern versione
-      (es. 0000311_2024.06.06), ovunque si trovi nel file
-    - Normalizza: strip, minuscolo, toglie eventuale punto finale
-    - Deduplica e ordina
-    - Ritorna testo con LF finale
-    """
-    lines = text.split("\n")
-
-    cleaned = []
-    seen = set()
-    for ln in lines:
-        s = ln.strip()
-        if not s:
-            continue
-        # scarta la riga di versione ovunque sia
-        if VERSION_LINE_RE.match(s):
-            continue
-
-        s = s.lower()
-        # opzionale: togli punto finale residuo
-        if s.endswith("."):
-            s = s[:-1]
-        # ignora eventuali commenti
-        if s.startswith("#"):
-            continue
-
-        if s not in seen:
-            seen.add(s)
-            cleaned.append(s)
-
-    cleaned.sort()
-    return "\n".join(cleaned) + ("\n" if cleaned else "")
 
 # ---------------------------
 # Download helper
@@ -420,3 +417,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
