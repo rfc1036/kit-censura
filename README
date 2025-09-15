@@ -62,7 +62,7 @@ Originally Written by Marco d'Itri <md@Linux.IT>.
 
 - Alerting and Logging
 - Privacy Shield Client by AAIP integration
-- CNCPO PEC Download Helper
+- CNCPO and AGCOM DDA PEC Download Helper
 - AGCOM, ADM and Consob parsers 
 - Many more bugfix and features
 Written by Antonio Bartolini <antonio.bartolini@connesi.it>
