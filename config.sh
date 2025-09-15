@@ -159,7 +159,7 @@ AGCOM_IMAP_USER='mailbox@mail.pecprovider.it'
 AGCOM_IMAP_PSWD='Dont tell anyone'
 
 # AGCOM IMAP FOLDER FOR ARCHIVE PROCESSED MESSAGES
-AGCOM_IMAP_ARCHIVE_FOLDER='Archivse-DDA'
+AGCOM_IMAP_ARCHIVE_FOLDER='Archive-DDA'
 
 # AGCOM PEC SENDER
 # You can allow multiple sender separated by comma
