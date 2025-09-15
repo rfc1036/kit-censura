@@ -239,7 +239,7 @@ FILE_consob='lista.consob'
 
 ##################### AAMS ########################
 # Local file for Aams list
-FILE_consob='lista.aams'
+FILE_aams='lista.aams'
 
 ##################### TABACCHI ########################
 FILE_tabacchi='lista.tabacchi'
