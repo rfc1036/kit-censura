@@ -281,6 +281,9 @@ TABACCHI_DOWNLOAD_HELPER='download_tabacchi.py'
 # Download Helper for CNCPO (in CNCPO_WORKING_DIR)
 CNCPO_DOWNLOAD_HELPER='download_attachment.py'
 
+# Download Helper for AGCOM (in AGCOM_WORKING_DIR)
+AGCOM_DOWNLOAD_HELPER='download_attachment.py'
+
 # Reply Helper for CNCPO (in CNCPO_WORKING_DIR)
 CNCPO_EMAIL_SENDER='email_sender.py'
 
