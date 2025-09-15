@@ -120,13 +120,87 @@ Cordiali Saluti.
 Acme S.p.A.
 "
 
-##################### AGCOM ########################
-# Local File for AGCOM
+##################### AGCOM DDA ########################
+# Local File for AGCOM DDAs
 FILE_agcom='lista.agcom'
 
-# AGCOM publish the DDAs one year behind. 
-# Do you want to update $FILE_agcom by hand instead of downloading it? Just put 'yes' here
-AGCOM_MANUAL='no'
+# What method for dowloading the AGCOM list? Valid options are "pec", "manual" or "website"
+##
+# - 'pec' for downloading the "Allegato B" from PEC (see configuration below)
+# - 'manual' for manually handle the "lista.agcom" file
+# - 'website' for download directly from AGCOM website (Beware that AGCOM website publish the DDAs one year behind)
+#
+AGCOM_METHOD='pec'
+
+### PEC Method Configuration parameters
+
+# WORKING DIR
+AGCOM_WORKING_DIR='agcom-dda'
+
+# DOWNLOAD DIR INSIDE AGCOM_WORKING_DIR
+AGCOM_DOWNLOAD_DIR='download'
+
+# DOWNLOAD FILE INSIDE AGCOM_WORKING_DIR
+AGCOM_FILE_NAME="blacklist-agcom-dda.txt"
+
+#TODO: CHECK IF NEEDED
+AGCOM_BLACKLIST_DIR='blacklist'
+
+# TEMPLATE FOR CONFIG FILE
+AGCOM_SETTINGS_TMPL='settings.yaml.template'
+
+# AGCOM PEC IMAP SERVER
+AGCOM_IMAP_SERVER='mail.pecprovider.it'
+
+# AGCOM PEC USERNAME
+AGCOM_IMAP_USER='mailbox@mail.pecprovider.it'
+
+# AGCOM PEC PASSWORD
+AGCOM_IMAP_PSWD='Dont tell anyone'
+
+# AGCOM IMAP FOLDER FOR ARCHIVE PROCESSED MESSAGES
+AGCOM_IMAP_ARCHIVE_FOLDER='Archivse-DDA'
+
+# AGCOM PEC SENDER
+# You can allow multiple sender separated by comma
+AGCOM_MAIL_FROM='agcom@cert.agcom.it'
+
+# SEND Automatic Reply?
+AGCOM_REPLY_ENABLED=true
+
+# Reply Helper for AGCOM (in AGCOM_WORKING_DIR)
+AGCOM_EMAIL_SENDER='email_sender.py'
+
+# Reply message Subject 
+AGCOM_REPLY_SUBJECT="Messaggio di avvenuta ricezione DDA AGCOM"
+
+# Reply message Sender 
+AGCOM_REPLY_SENDER=$AGCOM_IMAP_USER
+
+# Reply message Recipient
+AGCOM_REPLY_DESTINATION=$AGCOM_MAIL_FROM
+
+# Put Someone In Copy if needed
+#AGCOM_REPLY_CC='pippo@pluto.it'
+
+# SNMP Server
+AGCOM_SMTP_SERVER=$AGCOM_IMAP_SERVER
+
+# SNMP Authentication User
+AGCOM_REPLY_USERNAME=$AGCOM_IMAP_USER
+
+# SNMP Authentication PASSWORD
+AGCOM_REPLY_PASSWORD=$AGCOM_IMAP_PSWD
+
+# Message Template.
+# Underscore variables (_LISTAID_ , _LISTADATE_ and _DATE_) will be replaced automatically
+AGCOM_REPLY_TEMPLATE="Buongiorno,
+con la presente si segnala che in data _DATE_ e' avvenuta ricezione e applicazione della lista dei siti da inibire.
+
+Cordiali Saluti.
+SnakeOil S.p.A.
+"
+
 
 
 ##################### MANUALE ########################
