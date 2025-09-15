@@ -55,6 +55,9 @@ sub parse_aams_file {
 		s/[\r\n\s]+$//;
 		next if not $_;
 
+		# skip header line like 0000350_2025.29.08
+		next if /^\d+_\d{4}\.\d{2}\.\d{2}$/;
+
 		if (/^$RE{net}{IPv4}$/) {
 			push(@ips, $_);
 			next;
@@ -108,4 +111,3 @@ sub remove_subdomains {
 	# remove the deleted domains from the list
 	$l->{domains} = [ grep { defined $_ } @{ $l->{domains} } ];
 }
-

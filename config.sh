@@ -180,8 +180,11 @@ AGCOM_REPLY_SENDER=$AGCOM_IMAP_USER
 # Reply message Recipient
 AGCOM_REPLY_DESTINATION=$AGCOM_MAIL_FROM
 
-# Put Someone In Copy if needed
-#AGCOM_REPLY_CC='pippo@pluto.it'
+# Destination is PEC?
+AGCOM_REPLY_IS_PEC=true
+
+# Put Someone In Copy
+AGCOM_REPLY_CC=$NOC_EMAIL
 
 # SNMP Server
 AGCOM_SMTP_SERVER=$AGCOM_IMAP_SERVER

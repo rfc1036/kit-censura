@@ -44,19 +44,26 @@ if [ -e $AGCOM_DOWNLOAD_DIR/$AGCOM_FILE_NAME ] ; then
 
 	# answer
 		if [ $AGCOM_REPLY_ENABLED == true ] ; then 
-			echo "$AGCOM_REPLY_TEMPLATE" | sed "s/_DATE_/$(date)/g" | python $AGCOM_EMAIL_SENDER
-	
-			if [ $? != 0 ] ; then
-				SUBJECT="Error while sending reply message to AGCOM"
-				TXT="Unable to send reply message to $AGCOM_REPLY_DESTINATION"
-				if [ $ALERT_ENABLE == true ] && [ "x$NOC_EMAIL" != 'x' ] ; then
-							echo -e "Subject: $SUBJECT\nFrom:$FROM_EMAIL\n$TXT" | sendmail $NOC_EMAIL
+			
+			if [ $AGCOM_REPLY_IS_PEC == true ] ; then
+				echo "$AGCOM_REPLY_TEMPLATE" | sed "s/_DATE_/$(date)/g" | python $AGCOM_EMAIL_SENDER
+		
+				if [ $? != 0 ] ; then
+					SUBJECT="Error while sending reply message to AGCOM"
+					TXT="Unable to send reply message to $AGCOM_REPLY_DESTINATION"
+					if [ $ALERT_ENABLE == true ] && [ "x$NOC_EMAIL" != 'x' ] ; then
+								echo -e "Subject: $SUBJECT\nFrom:$FROM_EMAIL\n$TXT" | sendmail $NOC_EMAIL
+					fi
+					test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - AGCOM Error: $TXT" >> $LOGFILE
+					echo "Warning: $TXT" >&2
+					exit 255
+				else
+					test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Successfully Sent AGCOM PEC Reply" >> $LOGFILE
 				fi
-				test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - AGCOM Error: $TXT" >> $LOGFILE
-				echo "Warning: $TXT" >&2
-				exit 255
 			else
-				test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Successfully Sent AGCOM PEC Reply" >> $LOGFILE
+				TXT=$(echo "$AGCOM_REPLY_TEMPLATE" | sed "s/_DATE_/$(date)/g")
+				echo -e "Subject: $AGCOM_REPLY_SUBJECT\nFrom:$AGCOM_REPLY_SENDER\n$TXT" | sendmail $AGCOM_REPLY_DESTINATION
+				test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Successfully Sent AGCOM non-PEC Reply" >> $LOGFILE
 			fi
 		fi
 	
