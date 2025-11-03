@@ -180,5 +180,6 @@ Vedrai:
 ## 🧑‍💻 Autore
 
 **Antonio Bartolini**  
-📦 Repository: [`robynhub/kit-censura`](https://github.com/robynhub/kit-censura)  
+📦 Repository: [`rfc1036/kit-censura/`](https://github.com/rfc1036/kit-censura/)  
 📜 File: `censura-stats.php`
+
