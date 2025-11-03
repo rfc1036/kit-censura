@@ -159,17 +159,6 @@ Vedrai:
 
 ---
 
-## 🩻 Troubleshooting
-
-| Problema | Soluzione |
-|-----------|------------|
-| **Grafico vuoto** | Verifica output di `?data=summaries`, `?data=totals`, `?data=ips` |
-| **Errore “Unexpected token …”** | Cache corrotta → `sudo rm -f /var/cache/censura-stats/*.ndjson` |
-| **Cache lenta a generarsi** | Normale al primo rebuild; successivi più rapidi |
-| **Permessi negati** | Assicurati che PHP possa leggere i log e scrivere nella cache |
-
----
-
 ## 🔒 Sicurezza
 
 - Di default **non** richiede autenticazione → proteggi l’endpoint se pubblico.
@@ -182,4 +171,5 @@ Vedrai:
 **Antonio Bartolini**  
 📦 Repository: [`rfc1036/kit-censura/`](https://github.com/rfc1036/kit-censura/)  
 📜 File: `censura-stats.php`
+
 
