@@ -101,7 +101,7 @@ def download(imap, email_from_list, path, file_name_crypt ):
                         continue
                     fileName = part.get_filename()
 
-                    if fileName and re.search(r'^Allegato B Elenco URL \d+_\d{4}_\d{2}_\d{2}\s*\.txt$', fileName):
+                    if fileName and re.search(r'^Allegato B Elenco URL \d+_\d{4}_\d{2}_\d{2}.*\.txt$', fileName):
                         print("   [IMAPLIB:] BLACKLIST RETRIEVED IN DOWNLOAD: {name}".format(name=fileName))
                         filePath = os.path.join(path, file_name_crypt)
                         try:
