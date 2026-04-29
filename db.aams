@@ -6,6 +6,6 @@ $TTL 5M
                                       4W     ; Expire - 1 week
                                       5M )    ; Minimum
                 NS      localhost.
-                CNAME           sito-inibito-giochi.adm.gov.it.
-        IN      CNAME           sito-inibito-giochi.adm.gov.it.
-*       IN      CNAME           sito-inibito-giochi.adm.gov.it.
+@	IN 	A		217.175.53.72
+                A           	217.175.53.72
+*       IN      CNAME           sito-inibito-giochi.adm.gov.it
