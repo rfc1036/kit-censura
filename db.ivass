@@ -1,0 +1,11 @@
+$TTL 5M
+@       IN      SOA     ns.localhost. root.localhost.  (
+                                      1 ; Serial
+                                      4W      ; Refresh
+                                      4W      ; Retry
+                                      4W     ; Expire - 1 week
+                                      5M )    ; Minimum
+                NS      localhost.
+                A               109.73.81.54
+        IN      A               109.73.81.54
+*       IN      A               109.73.81.54

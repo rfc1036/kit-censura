@@ -23,6 +23,7 @@ and be easily extensible.
 - cncpo - Centro Nazionale Controllo Peodopornografia Online - Child Pornography - list NOT available to the public
 - consob - Commissione Nazionale per le Società e la Borsa - Trading - list available on https://www.consob.it/web/area-pubblica/oscuramenti
 - pscaiip - Piracy Shield Client implementation by A.I.I.P. - Copyright infringment - list not available yet
+- ivass - Istituto per la vigilanza sulle Assicurazionei - Assurance Fraud - List available on https://www.ivass.it
 - manuale - Self-managed list for custom entries 
 
 ** Requirements **
@@ -55,6 +56,10 @@ or
 
 if needed by your system.
 
+For download_ivass.py you will need pypdf:
+
+#  pip install pypdf
+
 ** Author **
 
 Copyright 2008-2024 by Seeweb s.r.l.
@@ -68,6 +73,8 @@ Originally Written by Marco d'Itri <md@Linux.IT>.
 Written by Antonio Bartolini <antonio.bartolini@connesi.it>
 
 supernets.py script from  https://github.com/grelleum/supernets
+
+download_ivass.py script Written by Antonio Prado
 
 The authors will appreciate receiving success or failure reports about
 the deployment this software.

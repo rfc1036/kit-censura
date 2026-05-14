@@ -1,0 +1,47 @@
+#!/bin/bash
+
+source config.sh
+
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Downloading Consob List" >> $LOGFILE
+
+# TODO make your own script
+if [ -e $IVASS_DOWNLOAD_HELPER ] ; then 
+	python $IVASS_DOWNLOAD_HELPER -o lists/ivass.new.tmp
+else 
+	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - IVASS Error: Helper $IVASS_DOWNLOAD_HELPER not found. See README" >> $LOGFILE
+	exit
+fi
+CURL_RETURN=$?
+
+if [ $CURL_RETURN != 0 ] ; then
+        SUBJECT="Error while fetching IVASS lists"
+        TXT="download_ivass.py on $(hostname --fqdn) have returned $CURL_RETURN when trying to parse the CMS"
+        if [ $ALERT_ENABLE == true ] && [ "x$NOC_EMAIL" != 'x' ] ; then
+	        echo -e "Subject: $SUBJECT\nFrom:$FROM_EMAIL\n$TXT" | sendmail $NOC_EMAIL
+	fi
+	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - IVASS Error: $TXT" >> $LOGFILE
+	echo "Warning: $TXT" >&2
+	exit 255
+
+fi
+
+
+cat lists/ivass.new.tmp | tr '[:upper:]' '[:lower:]' | sort | uniq > $FILE_ivass
+rm lists/ivass.new.tmp
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - IVASS List Downloaded" >> $LOGFILE
+
+if [ -e "$FILE_ivass" ]; then
+  egrep '^[^#]' $FILE_ivass | sed 's~http[s]*://~~g' | sort | uniq > lists/ivass.new.tmp
+  mv lists/ivass.new.tmp lists/ivass.new
+   test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Imported list of IP  $FILE_ivass" >> $LOGFILE
+elif [ ! -e lists/ivass.new ]; then
+  : > lists/ivass.new
+fi
+
+# allow manual add of specific IPs if file exists (ex lista.ivass-ip)
+  if [ -e $FILE_ivass-ip ]; then
+        egrep '^[^#]' $FILE_ivass-ip | sort | uniq > lists/ivass-ip
+	test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Imported list of IP  $FILE_ivass-ip" >> $LOGFILE
+  fi
+
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Import ivass Completed" >> $LOGFILE

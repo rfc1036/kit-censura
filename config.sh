@@ -12,7 +12,8 @@
 # cncpo - For CNCPO Lists (anti-pedophilia)
 # consob - For CONSOB Lists (Trading) - Not Mandatory and BROKEN right now since they have implemented anti-bot protection.
 # pscaiip - For Privacy Shield FQDN or IPv4 created by exteral tool provided by AIIP (Associazione Italiana Internet Provider)
-LISTS="manuale aams tabacchi agcom consob cncpo pscaiip"
+# ivass - For IVASS Lists (Assurance companies)
+LISTS="manuale aams tabacchi agcom consob cncpo pscaiip ivass"
 
 # Lists to be downloaded/updated
 # You might use all lists here. To be used to keep old
@@ -237,6 +238,11 @@ ALERT_PSCAIIP_ENABLE=true
 # Local file for Consob list
 FILE_consob='lista.consob'
 
+##################### IVASS ########################
+# Local file for Ivass list
+FILE_ivass='lista.ivass'
+
+
 ##################### AAMS ########################
 # Local file for Aams list
 FILE_aams='lista.aams'
@@ -271,6 +277,9 @@ AGCOM_DOWNLOAD_HELPER='download_agcom.py'
 
 # Download Helper for consob
 CONSOB_DOWNLOAD_HELPER='download_consob.py'
+
+# Download Helper for ivass
+IVASS_DOWNLOAD_HELPER='download_ivass.py'
 
 # Download Helper for aams
 AAMS_DOWNLOAD_HELPER='download_aams.py'
