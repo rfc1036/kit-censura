@@ -30,9 +30,9 @@ echo "server:" > $CONF.new
 for list in $LISTS; do
   case "$list" in
   cncpo) ipredir='212.25.179.125' ;;
-  aams)  ipredir='217.175.53.72' ;;
-  tabacchi) ipredir='217.175.53.228' ;;
-  #*)     ipredir='127.0.0.1' ;;
+  aams)     ipredir='sito-inibito-giochi.adm.gov.it.' ;;
+  tabacchi) ipredir='sito-inibito-tabacchi.adm.gov.it.' ;;
+  manuale)     ipredir='127.0.0.1' ;;
   *)     ipredir='' ;;
   esac
 
