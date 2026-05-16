@@ -121,7 +121,7 @@ def normalize_domain(raw_url):
     Ricava il dominio registrato da un URL/dominio grezzo.
     Restituisce None se non è un dominio valido o va escluso.
     """
-    result = tldext(raw)                                                                                                                        
+    result = tldext(raw_url)                                                                                                                        
     tsd, td, tsu = result.subdomain, result.domain, result.suffix
     if not td or not tsu:
         return None
