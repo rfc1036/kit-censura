@@ -12,72 +12,194 @@ Censorship is the removal or withholding of information from the public
 by a controlling group or body. (Wikipedia entry for Censorship.)
 
 This suite of programs implements by-domain and by-IP censorship of the
-Internet. It is designed to be able to accomodate multiple blacklists
-and be easily extensible.
+Internet. It is designed to accommodate multiple blacklists from
+different Italian regulatory authorities and to be easily extensible.
 
-** Lists of Modules Supported by this software **
+BIG WARNING: This project is meant to be a TOOLKIT to meet the legal
+requirements of Internet censorship in Italy. IT IS NOT meant to be
+used as-is or as a stand-alone all-in-one solution.
+It must be adapted and customised to YOUR systems and needs.
+Feel free to modify, enable and disable features as needed.
 
-- aams - Agenzia Dogane e Monopoli - Gambling - list available on https://www.adm.gov.it/portale/siti-web-inibiti-giochi
-- tabacchi - Agenzia Dogane e Monopoli - Tobacco Control - list available on https://www.adm.gov.it/portale/siti-inibiti-tabacchi
-- agcom - Autorita' per le garanzie nelle comunicazioni  - Copyright infringment - list available on https://www.agcom.it/provvedimenti-a-tutela-del-diritto-d-autore (AGCOM don't update the website)
-- cncpo - Centro Nazionale Controllo Peodopornografia Online - Child Pornography - list NOT available to the public
-- consob - Commissione Nazionale per le Società e la Borsa - Trading - list available on https://www.consob.it/web/area-pubblica/oscuramenti
-- pscaiip - Piracy Shield Client implementation by A.I.I.P. - Copyright infringment - list not available yet
-- ivass - Istituto per la vigilanza sulle Assicurazionei - Assurance Fraud - List available on https://www.ivass.it
-- manuale - Self-managed list for custom entries 
+
+** Supported lists **
+
+- aams     - Agenzia Dogane e Monopoli - Gambling
+             https://www.adm.gov.it/portale/siti-web-inibiti-giochi
+- tabacchi - Agenzia Dogane e Monopoli - Tobacco Control
+             https://www.adm.gov.it/portale/siti-inibiti-tabacchi
+- agcom    - Autorità per le Garanzie nelle Comunicazioni - Copyright infringement
+             https://www.agcom.it/provvedimenti-a-tutela-del-diritto-d-autore
+             Note: the AGCOM website is typically one year behind;
+             the PEC method (see config.sh) is strongly recommended.
+- cncpo    - Centro Nazionale per il Contrasto della Pedopornografia Online
+             Child sexual abuse material - list NOT available to the public
+             Received via encrypted PEC. See README.cncpo.
+- consob   - Commissione Nazionale per le Società e la Borsa - Unauthorized trading
+             https://www.consob.it/web/area-pubblica/oscuramenti
+- pscaiip  - Piracy Shield, client implementation by A.I.I.P. - Copyright infringement
+             Reserved for AIIP members. See README.pscaiip.
+- ivass    - Istituto per la Vigilanza sulle Assicurazioni - Insurance fraud
+             https://www.ivass.it
+- manuale  - Self-managed list for custom entries (domains and/or IPs)
+
+
+** Project structure **
+
+The project is organized around a simple pipeline:
+
+  censorship-get  →  update_* / parse_*  →  build-*-config  →  censorship-apply
+
+Detailed component map: see ARCHITECTURE.md.
+
+Main files:
+
+  config.sh                   Central configuration (all tuneable parameters)
+  censorship-cron             Main cron entry point: calls get, summary, apply
+  censorship-cron-pscaiip     Dedicated cron for Piracy Shield (runs every 5 min)
+  censorship-get              Downloads and parses all configured lists
+  censorship-apply            Applies the lists to DNS and IP routing
+  censorship-summary          Writes list statistics to the log file
+  update_<list>               Per-list download and pre-processing scripts
+  parse_cncpo                 Perl parser for CNCPO CSV format
+  parse_aams                  Perl parser for plain-text domain lists (also used
+                              by AGCOM and other plain-text sources)
+  download_*.py               Python helpers for HTTP-based list downloads
+  build-bind-config           Generates the named.conf fragment for BIND
+  build-unbound-config        Generates the include file for Unbound
+  upload-bind-config          Distributes the BIND configuration to name servers via rsync
+  upload-unbound-config       Distributes the Unbound configuration to name servers via rsync
+  install-routes-linux        Installs/removes null routes (RTBH) via `ip route`
+  supernets.py                Aggregates IP prefixes before installing routes
+  cncpo/                      Working directory and helpers for CNCPO PEC processing
+  agcom-dda/                  Working directory and helpers for AGCOM PEC processing
+  db.*                        BIND zone files (one per list, contain the NXDOMAIN response)
+  lists/                      Runtime directory: intermediate and final list files (gitignored)
+  examples/                   Reference crontab and logrotate configuration
+  contrib/                    Third-party contributed tools (e.g. censura-stats)
+
 
 ** Requirements **
 
-install-routes-linux: iproute
-parse_aams:  Regexp::Common >= 2013031201, List::MoreUtils, File::Slurp
-parse_agcom: Regexp::Common >= 2013031201, List::MoreUtils, File::Slurp
-parse_cncpo: Text::CSV >= 0.32
-update_*: wget curl
-upload-bind-config: rsync (local and remote), BIND (remote)
-upload-unbound-config: rsync (local and remote), Unbound (remote)
-python version >= 3.0
+  install-routes-linux:   iproute2
+  parse_aams:             Regexp::Common >= 2013031201, List::MoreUtils, File::Slurp
+  parse_agcom:            Regexp::Common >= 2013031201, List::MoreUtils, File::Slurp
+  parse_cncpo:            Text::CSV >= 0.32, List::MoreUtils, File::Slurp
+  upload-bind-config:     rsync (local), BIND + rsync + rndc (remote)
+  upload-unbound-config:  rsync (local), Unbound + rsync (remote)
+  Python >= 3.0 with the following packages
 
-if you are using debian or ubuntu you can install all dependencies with the
-following command:
+On Debian/Ubuntu, install all dependencies with:
 
-# apt-get install python3 python3-openssl python3-requests-unixsocket \
-	python3-urllib3 python3-bs4 python3-requests libfile-slurp-perl \
-	rsync wget perl libregexp-common-perl liblist-moreutils-perl \
-	python3-click python3-soupsieve python3-orderedattrdict \
-	python3-tldextract pip curl python3-yaml python3-imaplib2 iproute2
-		
-and since url extract and ua-generator aren't available as a package: 
+  # apt-get install python3 python3-openssl python3-requests-unixsocket \
+        python3-urllib3 python3-bs4 python3-requests libfile-slurp-perl \
+        rsync wget perl libregexp-common-perl liblist-moreutils-perl \
+        python3-click python3-soupsieve python3-orderedattrdict \
+        python3-tldextract pip curl python3-yaml python3-imaplib2 iproute2
 
-# pip install urlextract ; pip install ua-generator
+The following packages are not available via apt and must be installed via pip:
 
-or 
+  # pip install urlextract ua-generator
+  (add --break-system-packages if required by your system)
 
-# pip install urlextract --break-system-packages ; pip install ua-generator --break-system-packages
+download_ivass.py additionally requires pypdf:
 
-if needed by your system.
+  # pip install pypdf
 
-For download_ivass.py you will need pypdf:
 
-#  pip install pypdf
+** Quick start **
 
-** Author **
+1. Read and edit config.sh carefully before running anything.
+
+2. Run the bootstrap script once from the installation directory:
+
+     # bash bootstrap.sh
+
+   This creates the required empty files and directories (lists/, tmp/, gpg/).
+
+3. Set up the cron jobs (see Cron requirements below).
+
+4. Configure your name servers (see Name servers configuration below).
+
+For CNCPO, follow the additional setup steps in README.cncpo.
+For Piracy Shield, follow README.pscaiip.
+
+
+** Cron requirements **
+
+censorship-cron is the main script to be scheduled via cron:
+
+  # run every 6 hours
+  27  */6  * * *   root   /root/kit-censura/censorship-cron &> /dev/null
+
+If you are using the Piracy Shield Client by AIIP, add a second job:
+
+  # run every 5 minutes
+  */5  *   * * *   root   /root/kit-censura/censorship-cron-pscaiip &> /dev/null
+
+See examples/crontab for a ready-to-use template.
+
+
+** Logging and alerting **
+
+Logging and alerting are configured in config.sh.
+
+The default log file path is /var/log/kit-censura.log.
+A logrotate template is available in examples/kit-censura.logrotate.
+
+Alerting sends an email via sendmail when a list download fails.
+Set NOC_EMAIL in config.sh and ensure sendmail is working correctly.
+
+
+** Name servers configuration **
+
+The following include directives must be added to your name server daemon:
+
+  # named.conf (BIND)
+  include "/etc/bind/censura/named.conf";
+
+  # unbound.conf (Unbound)
+  include: "/etc/unbound/censura.conf"
+
+The db.* zone files must be present in the directory configured as
+$CONFDIR in config.sh (default: /etc/bind/censura/).
+
+The list of target name servers is configured via $SERVERS in config.sh.
+
+
+** IP routing (blackholing) **
+
+install-routes-linux installs null routes for the IP addresses contained
+in the active lists, using $BLACKHOLE_NEXTHOP as the next hop.
+It is intended to run on a border router or on a system from which a
+dynamic routing protocol (e.g. quagga/FRR with BGP) will redistribute
+the static routes.
+
+The script replaces all existing null routes on each run, so it is
+safe to call repeatedly.
+
+When AGGREGATE_PREFIX=true (default), supernets.py is called first to
+aggregate contiguous prefixes into the smallest set of covering CIDRs
+up to the length defined by AGGREGATION_MAXLEN (default: /25).
+
+
+** Authors **
 
 Copyright 2008-2024 by Seeweb s.r.l.
-Originally Written by Marco d'Itri <md@Linux.IT>.
+Originally written by Marco d'Itri <md@Linux.IT>.
 
-- Alerting and Logging
-- Privacy Shield Client by AAIP integration
-- CNCPO and AGCOM DDA PEC Download Helper
-- AGCOM, ADM and Consob parsers 
-- Many more bugfix and features
+- Alerting and logging
+- Piracy Shield Client by AIIP integration
+- CNCPO and AGCOM DDA PEC download helpers
+- AGCOM, ADM and Consob parsers
+- Many further bugfixes and features
 Written by Antonio Bartolini <antonio.bartolini@connesi.it>
 
-supernets.py script from  https://github.com/grelleum/supernets
-
-download_ivass.py script Written by Antonio Prado
+supernets.py from https://github.com/grelleum/supernets
+download_ivass.py written by Antonio Prado
 
 The authors will appreciate receiving success or failure reports about
-the deployment this software.
+the deployment of this software.
 
 
 ** License **
@@ -86,64 +208,3 @@ This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
-
-
-** Usage **
-
-Many scripts contain configuration variables that are stored in config.sh. 
-Read and understand each one before before running them.
-Start from censorship-get and then censorship-apply.
-
-Before starting make sure to run the bootstrap script in working path:
-
-# bash bootstrap.sh
-
-The install-routes-linux script can be run directly on a border router
-or on a system where a dynamic routing protocol will redistribute the
-static routes it installs.
-
-BIG WARNING: This project is meant to be a TOOLKIT to meet the legal 
-requirements of censorship in Italy and IT IS NOT meant to be used as 
-it is or as a stand-alone all-in-one solution. 
-It must be adapted and customised to YOUR systems and needs. 
-Feel free to modify, enable and disable features as needed.
-
-** Cron requirements **
-
-censorship-cron is the script to be called via cron:
-
-# run every 6 hours
-27  */6  * * *     root   /root/kit-censura/censorship-cron  &> /dev/null
-
-If you are using the Piracy Shield Client by AIIP see README.pscaiip
-
-** Logging and Alerting **
-
-You can enable Logging and Alerting by changing config.sh file.
-By default the log file is placed on /var/log/kit-censura.log
-
-If log rotation is needed there is a template for logrotate in 
-examples/kit-censura.logrotate file ready to be edited and moved on 
-logrotate.d directory.
-
-Alerting is triggered only when downloads fails for some reasons and
-send an email of warning at the address specified in config.sh file.
-Just be sure that sendmail tool is working propely.
-
-** Name servers configuration **
-
-Something like this should be added to the main configuration file of
-your name server daemon:
-
-# named.conf (BIND)
-include "/etc/bind/censura/named.conf";
-
-# unbound.conf (Unbound)
-include: "/etc/unbound/censura.conf"
-
-and the db.* files need to be copied in the $CONFDIR directory configured
-in the build-bind-config script (default: /etc/bind/censura/).
-
-The list of your name servers must be configured in the upload-bind-config
-script.
-
