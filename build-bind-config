@@ -15,7 +15,12 @@ list2namedconf() {
   local list="$1"
 
   local name
-  for name in $(grep '^[^#]' lists/$list); do
+  for name in $(
+    grep '^[^#]' "lists/$list" |
+      python3 filter-whitelist.py \
+        --type domain \
+        --whitelist "$WHITELIST_FILE"
+  ); do
     echo "zone \"$name\" { type master; file \"$CONFDIR/db.$list\"; };"
   done
 }
