@@ -30,27 +30,45 @@ def domain_is_whitelisted(domain, whitelist):
 
 
 def load_ip_networks(path):
+    """Load valid IPv4 and IPv6 addresses or CIDR networks."""
     networks = []
 
-    for entry in load_entries(path):
-        try:
-            networks.append(ipaddress.ip_network(entry, strict=False))
-        except ValueError as error:
-            print(
-                f"Warning: invalid whitelist IP/network {entry!r}: {error}",
-                file=sys.stderr,
-            )
+    try:
+        with open(path, encoding="utf-8") as source:
+            for line_number, raw_line in enumerate(source, start=1):
+                entry = raw_line.split("#", 1)[0].strip().lower()
+
+                if not entry:
+                    continue
+
+                try:
+                    networks.append(
+                        ipaddress.ip_network(entry, strict=False)
+                    )
+                except ValueError as error:
+                    print(
+                        f"Warning: invalid IP/network in {path}:{line_number}: "
+                        f"{entry!r}: {error}",
+                        file=sys.stderr,
+                    )
+    except FileNotFoundError:
+        pass
 
     return networks
 
 
 def ip_is_whitelisted(value, networks):
+    """Return True if the address or network is covered by the IP whitelist."""
     try:
         candidate = ipaddress.ip_network(value.strip(), strict=False)
     except ValueError:
         return False
 
-    return any(candidate.subnet_of(network) for network in networks)
+    return any(
+        candidate.version == network.version
+        and candidate.subnet_of(network)
+        for network in networks
+    )
 
 
 def main():
