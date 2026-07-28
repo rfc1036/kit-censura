@@ -19,11 +19,13 @@ for i in $LISTS ; do
 	fi
 done
 
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Whitelisting started." >> $LOGFILE
 sort -u "$TEMPFILE" |
     python3 filter-whitelist.py \
         --type ip \
         --whitelist "$WHITELIST_IP_FILE" \
         > "$CONF_IP-new"
+test $LOGGING_ENABLE == true && echo "$(date '+%d/%m/%y %H:%M:%S') - Whitelisting ended." >> $LOGFILE
 
 rm $TEMPFILE
 
