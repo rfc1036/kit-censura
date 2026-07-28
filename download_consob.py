@@ -117,6 +117,23 @@ def extract_domain_from_url(u: str):
 def is_consob_domain(domain: str):
     return domain.endswith("consob.it")
 
+EXCLUDED_DOMAINS = {
+    "normattiva.it",
+}
+
+def is_excluded_domain(domain: str):
+    return any(
+        domain == excluded or domain.endswith("." + excluded)
+        for excluded in EXCLUDED_DOMAINS
+    )
+
+def is_blocked_domain_candidate(domain: str):
+    return (
+        domain
+        and not is_consob_domain(domain)
+        and not is_excluded_domain(domain)
+    )
+
 def looks_like_next(text):
     t = (text or "").strip().lower()
     return any(k in t for k in ("successiva", "pagina successiva", "avanti", "next", "›", "»"))

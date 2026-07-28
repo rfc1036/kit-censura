@@ -21,6 +21,14 @@ LISTS="manuale aams tabacchi agcom consob cncpo pscaiip ivass"
 # new records
 UPDATE_LISTS=$LISTS
 
+##################### WHITELIST ########################
+
+# Domains that should not be blocked.
+# Every domain include it's subdomains
+WHITELIST_FILE='lista.whitelist'
+
+# IPv4, IPv6 o networks CIDR that should not be blocked
+WHITELIST_IP_FILE='lista.whitelist-ip'
 
 ########### Alerting 
 

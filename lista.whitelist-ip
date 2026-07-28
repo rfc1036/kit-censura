@@ -1,0 +1,8 @@
+# IP addresses and networks that must not be blocked.
+# IPv4, IPv6, and CIDR notation are supported.
+# Enter one address or network per line.
+#
+# Examples:
+# 192.0.2.10
+# 198.51.100.0/24
+# 2001:db8::/32

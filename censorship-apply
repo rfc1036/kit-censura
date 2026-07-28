@@ -19,8 +19,12 @@ for i in $LISTS ; do
 	fi
 done
 
+sort -u "$TEMPFILE" |
+    python3 filter-whitelist.py \
+        --type ip \
+        --whitelist "$WHITELIST_IP_FILE" \
+        > "$CONF_IP-new"
 
-cat $TEMPFILE | sort | uniq > $CONF_IP-new
 rm $TEMPFILE
 
 if [ $AGGREGATE_PREFIX == 'true' ] ; then

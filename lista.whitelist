@@ -1,0 +1,6 @@
+# Domains that must not be blocked.
+# Enter one domain per line, without an URL scheme.
+# Each listed domain also allows all of its subdomains.
+#
+# Example:
+# example.org
