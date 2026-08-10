@@ -116,23 +116,68 @@ def get_all_pdf_urls():
     return pdf_urls
 
 
+def is_valid_hostname(hostname):
+    """
+    Valida sintatticamente un hostname DNS.
+
+    Regole principali:
+      - lunghezza massima complessiva: 253 caratteri
+      - ogni label: 1..63 caratteri
+      - solo lettere, numeri e trattino
+      - una label non può iniziare o terminare con '-'
+
+    Esempio scartato:
+      -parlare-prima-operatore.it
+    """
+    if not hostname:
+        return False
+
+    hostname = hostname.strip().lower().rstrip(".")
+
+    if len(hostname) > 253:
+        return False
+
+    labels = hostname.split(".")
+    if len(labels) < 2:
+        return False
+
+    label_re = re.compile(r"^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$", re.IGNORECASE)
+
+    for label in labels:
+        if not label or len(label) > 63:
+            return False
+        if not label_re.fullmatch(label):
+            return False
+
+    return True
+
+
 def normalize_domain(raw_url):
     """
     Ricava il dominio registrato da un URL/dominio grezzo.
     Restituisce None se non è un dominio valido o va escluso.
     """
-    result = tldext(raw_url)                                                                                                                        
-    tsd, td, tsu = result.subdomain, result.domain, result.suffix
+    tsd, td, tsu = tldext(raw_url)
     if not td or not tsu:
         return None
+
     full = f"{tsd}.{td}.{tsu}" if tsd else f"{td}.{tsu}"
-    base = f"{td}.{tsu}"
+    full = full.lower().strip(".")
+    base = f"{td}.{tsu}".lower().strip(".")
+
+    # IMPORTANT: tldextract può estrarre componenti anche da hostname
+    # sintatticamente invalidi. La validazione va quindi fatta esplicitamente.
+    if not is_valid_hostname(full):
+        return None
+
     if base in EXCLUDE_DOMAINS or full in EXCLUDE_DOMAINS:
         return None
+
     # Scarta indirizzi IP, localhost e token generici
-    if re.match(r"^\d+\.\d+\.\d+\.\d+$", td):
+    if re.match(r"^\d+\.\d+\.\d+\.\d+$", full):
         return None
-    return full.lower().strip(".")
+
+    return full
 
 
 def extract_domains_from_pdf(pdf_bytes):
