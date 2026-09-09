@@ -28,9 +28,18 @@ list2unboundconf() {
   fi
 
   if [ "$ipredir" ]; then
-    for name in $names; do
-      printf "\tlocal-data: \"$name A $ipredir\"\n"
-    done
+    case "$ipredir" in
+      *[!0-9.]*)
+        for name in $names; do
+          printf "\tlocal-data: \"$name CNAME $ipredir\"\n"
+        done
+        ;;
+      *)
+        for name in $names; do
+          printf "\tlocal-data: \"$name A $ipredir\"\n"
+        done
+        ;;
+    esac
   else
     for name in $names; do
       printf "\tlocal-zone: \"$name\" static\n"
@@ -45,8 +54,9 @@ for list in $LISTS; do
   case "$list" in
   cncpo)    ipredir='212.25.179.125' ;;
   aams)     ipredir='sito-inibito-giochi.adm.gov.it.' ;;
+  ivass)    ipredir='warning.ivass.it.' ;;
   tabacchi) ipredir='sito-inibito-tabacchi.adm.gov.it.' ;;
-  manuale)  ipredir='127.0.0.1' ;;
+  manuale)  ipredir='0.0.0.0' ;;
   *)        ipredir='' ;;
   esac
 
