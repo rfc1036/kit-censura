@@ -8,8 +8,9 @@ che contiene i domini da bloccare come hyperlink e/o testo. Lo script:
   2. Raccoglie i link ai PDF dei provvedimenti (pattern ivcs*.pdf)
   3. Per ciascun PDF estrae domini via testo (pypdf + URLExtract)
      e via annotazioni ipertestuali
-  4. Filtra i domini interni IVASS e normalizza con tldextract
-  5. Scrive un dominio per riga nel file di output
+  4. Normalizza alcuni caratteri Unicode tipografici presenti nei PDF
+  5. Filtra i domini interni IVASS e normalizza con tldextract
+  6. Scrive un dominio per riga nel file di output
 """
 
 import io
@@ -26,6 +27,27 @@ from urllib3.exceptions import InsecureRequestWarning
 
 
 HTTP_RE = re.compile(r'https?://([^\s\'"<>),;]+)', re.IGNORECASE)
+
+# Alcuni PDF IVASS contengono trattini tipografici Unicode all'interno dei
+# domini (ad esempio EN DASH U+2013 al posto del normale '-' ASCII).
+# Senza normalizzazione una stringa come "auito–gruppo.com" viene spezzata
+# dalla regex e può generare il falso positivo "gruppo.com".
+DASH_TRANSLATION = str.maketrans({
+    "\u2010": "-",  # hyphen
+    "\u2011": "-",  # non-breaking hyphen
+    "\u2012": "-",  # figure dash
+    "\u2013": "-",  # en dash
+    "\u2014": "-",  # em dash
+    "\u2212": "-",  # minus sign
+    "\ufe58": "-",  # small em dash
+    "\ufe63": "-",  # small hyphen-minus
+    "\uff0d": "-",  # fullwidth hyphen-minus
+})
+
+
+def normalize_pdf_text(text):
+    """Normalizza caratteri tipografici Unicode problematici nei PDF."""
+    return text.translate(DASH_TRANSLATION)
 
 
 def _build_tld_re():
@@ -56,12 +78,9 @@ requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 BASE_URL = "https://www.ivass.it"
 INDEX_URL = BASE_URL + "/cyber/siti-abusivi/index.html"
 
-# Timeout HTTP: (connect timeout, read timeout)
 HTTP_TIMEOUT = (10, 30)
 
-# Domini da escludere sempre (IVASS stesso, enti istituzionali, social media)
 EXCLUDE_DOMAINS = {
-    # Istituzionali
     "ivass.it",
     "governo.it",
     "giustizia.it",
@@ -71,8 +90,6 @@ EXCLUDE_DOMAINS = {
     "agcm.it",
     "agcom.it",
     "mef.gov.it",
-
-    # Social media presenti nei footer/contatti dei PDF IVASS
     "facebook.com",
     "fb.com",
     "instagram.com",
@@ -100,13 +117,8 @@ def get_all_pdf_urls():
         url = f"{INDEX_URL}?page={page_num}" if page_num > 1 else INDEX_URL
 
         try:
-            resp = requests.get(
-                url,
-                verify=False,
-                timeout=HTTP_TIMEOUT
-            )
+            resp = requests.get(url, verify=False, timeout=HTTP_TIMEOUT)
             resp.raise_for_status()
-
         except Exception as e:
             print(
                 f"Warning: impossibile recuperare pagina {page_num}: {e}",
@@ -123,7 +135,6 @@ def get_all_pdf_urls():
             if href.startswith("/"):
                 href = BASE_URL + href
 
-            # Considera solo i comunicati IVASS (pattern ivcs*.pdf)
             if "ivcs" not in href.lower():
                 continue
 
@@ -135,7 +146,6 @@ def get_all_pdf_urls():
         if found_on_page == 0:
             break
 
-        # Passa alla pagina successiva se esiste il link
         if not soup.find(
             "a",
             href=re.compile(rf"[?&]page={page_num + 1}")
@@ -148,18 +158,7 @@ def get_all_pdf_urls():
 
 
 def is_valid_hostname(hostname):
-    """
-    Valida sintatticamente un hostname DNS.
-
-    Regole principali:
-      - lunghezza massima complessiva: 253 caratteri
-      - ogni label: 1..63 caratteri
-      - solo lettere, numeri e trattino
-      - una label non può iniziare o terminare con '-'
-
-    Esempio scartato:
-      -parlare-prima-operatore.it
-    """
+    """Valida sintatticamente un hostname DNS."""
 
     if not hostname:
         return False
@@ -193,10 +192,12 @@ def normalize_domain(raw_url):
     """
     Ricava il dominio registrato da un URL/dominio grezzo.
     Restituisce None se non è un dominio valido o va escluso.
-
-    Compatibile con le versioni recenti di tldextract, nelle quali
-    extract() restituisce un ExtractResult non iterabile.
     """
+
+    if not raw_url:
+        return None
+
+    raw_url = normalize_pdf_text(str(raw_url).strip())
 
     result = tldext(raw_url)
 
@@ -212,15 +213,12 @@ def normalize_domain(raw_url):
 
     base = f"{td}.{tsu}".lower().strip(".")
 
-    # tldextract può estrarre componenti anche da hostname
-    # sintatticamente invalidi. La validazione va fatta esplicitamente.
     if not is_valid_hostname(full):
         return None
 
     if base in EXCLUDE_DOMAINS or full in EXCLUDE_DOMAINS:
         return None
 
-    # Scarta indirizzi IP, localhost e token generici
     if re.match(r"^\d+\.\d+\.\d+\.\d+$", full):
         return None
 
@@ -237,9 +235,8 @@ def extract_domains_from_pdf(pdf_bytes, pdf_url=None):
         reader = pypdf.PdfReader(io.BytesIO(pdf_bytes))
 
         for page in reader.pages:
-
-            # 1. Testo visibile
             text = page.extract_text() or ""
+            text = normalize_pdf_text(text)
             candidates = set()
 
             for match in HTTP_RE.finditer(text):
@@ -253,11 +250,9 @@ def extract_domains_from_pdf(pdf_bytes, pdf_url=None):
 
             for raw in candidates:
                 d = normalize_domain(raw)
-
                 if d:
                     domains.add(d)
 
-            # 2. Annotazioni hyperlink (URI embedded nel PDF)
             if "/Annots" in page:
                 for annot_ref in page["/Annots"]:
                     try:
@@ -267,15 +262,13 @@ def extract_domains_from_pdf(pdf_bytes, pdf_url=None):
                             action = annot.get("/A")
 
                             if action and action.get("/S") == "/URI":
-                                uri = str(action["/URI"])
+                                uri = normalize_pdf_text(str(action["/URI"]))
                                 d = normalize_domain(uri)
 
                                 if d:
                                     domains.add(d)
 
                     except Exception:
-                        # Una annotazione malformata non deve invalidare
-                        # l'intero PDF.
                         pass
 
     except Exception as e:
@@ -375,3 +368,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
